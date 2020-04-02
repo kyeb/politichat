@@ -10,6 +10,6 @@ run hotloader in another!
 You'll need Node.js installed, and a .env file in the top level directory for the Mongo connection
 string. Use `cp .env.example .env` and edit your .env file accordingly.
 
-Then, run `npm start` in one terminal, and `npm run hotloader in another`. You
+Then, run `npm start` in one terminal, and `npm run hotloader` in another. You
 should then be able to open the site in your browser at `localhost:500`!
 
