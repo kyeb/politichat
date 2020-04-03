@@ -1,0 +1,44 @@
+/* Application-wide styles */
+.app-container {
+  padding: 20px;
+  padding-bottom: 60px;
+  position: relative;
+  min-height: 100vh;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.header-icon {
+  padding-right: 7px;
+}
+
+.auth-logout {
+  height: 36px;
+}
+
+.auth-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-buttons {
+  padding: 10px 0;
+}
+
+.login-input {
+  width: 30vw;
+  padding: 5px 0;
+}
+
+footer {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+}
+
+.footer-content {
+  text-align: center;
+}

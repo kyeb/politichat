@@ -1,16 +1,16 @@
 import React, { Component } from "react";
 import { Router } from "@reach/router";
-import NotFound from "./pages/NotFound.js";
-import Home from "./pages/Home.js";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCommentAlt } from "@fortawesome/free-solid-svg-icons";
 
 import "../utilities.css";
+import "../styles.css";
 import { socket } from "../client-socket.js";
 
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { fab } from "@fortawesome/free-brands-svg-icons";
-import { fas } from "@fortawesome/free-solid-svg-icons";
+import NotFound from "./pages/NotFound.js";
+import Home from "./pages/Home.js";
+import AuthController from "./modules/AuthController";
 
-library.add(fab, fas);
 /**
  * Define the "App" component as a class.
  */
@@ -37,18 +37,32 @@ class App extends Component {
   };
 
   render() {
+    const authController = (
+      <AuthController
+        logout={this.handleLogout}
+        loggedIn={this.state.user !== undefined}
+        setUser={this.setUser}
+        providers={["google"]}
+      />
+    );
+
     return (
-      <>
+      <div className="app-container">
+        <header>
+          <h1 className="header">
+            <FontAwesomeIcon icon={faCommentAlt} className="header-icon" />
+            Politichat
+          </h1>
+          {this.state.user && <div className="header-buttons">{authController}</div>}
+        </header>
         <Router>
-          <Home
-            path="/"
-            setUser={this.setUser}
-            logout={this.handleLogout}
-            user={this.state.user}
-          />
+          <Home path="/" setUser={this.setUser} logout={this.handleLogout} user={this.state.user} />
           <NotFound default />
         </Router>
-      </>
+        <footer>
+          <p className="footer-content">Made by Sabrina and Kye for CS91r</p>
+        </footer>
+      </div>
     );
   }
 }

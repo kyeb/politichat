@@ -9,13 +9,12 @@ var schemaOptions = {
   },
 };
 
-const UserSchema = new mongoose.Schema(
+const RoomSchema = new mongoose.Schema(
   {
-    username: String,
-    password: String,
+    key: String,
   },
   schemaOptions
 );
 
 // compile model from schema
-module.exports = mongoose.model("user", UserSchema);
+module.exports = mongoose.model("room", RoomSchema);

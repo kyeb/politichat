@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 
-import "../../utilities.css";
-import "./Home.css";
 import AuthController from "../modules/AuthController";
+
 class Home extends Component {
   constructor(props) {
     super(props);
@@ -15,17 +14,16 @@ class Home extends Component {
   }
 
   render() {
-    return (
-      <>
-        <AuthController
-          logout={this.props.logout}
-          loggedIn={this.props.user !== undefined}
-          setUser={this.props.setUser}
-          providers={["google"]}
-        />
-        <h1>Hello World</h1>
-      </>
+    const authController = (
+      <AuthController
+        logout={this.props.logout}
+        loggedIn={this.props.user !== undefined}
+        setUser={this.props.setUser}
+        providers={["google"]}
+      />
     );
+
+    return <div>{this.props.user ? <p>test</p> : authController}</div>;
   }
 }
 

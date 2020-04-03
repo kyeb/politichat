@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import { post } from "../../utilities.js";
+import { Button, Input, Form } from "semantic-ui-react";
 
 class LocalAuth extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      email: "",
+      username: "",
       password: "",
       passwordConfirm: "",
       isRegistering: false,
@@ -20,11 +21,11 @@ class LocalAuth extends Component {
   };
 
   attemptLogin = () => {
-    const { email, password } = this.state;
-    if (email === "" || password === "") {
+    const { username, password } = this.state;
+    if (username === "" || password === "") {
       this.setState({ errorMessage: "Must have non-empty usename/password" });
     } else {
-      post("/auth/login", { email, password })
+      post("/auth/login", { username, password })
         .then((user) => {
           this.props.login(user);
         })
@@ -37,19 +38,19 @@ class LocalAuth extends Component {
   };
 
   attemptRegister = () => {
-    const { email, password, passwordConfirm } = this.state;
+    const { username, password, passwordConfirm } = this.state;
     if (password != passwordConfirm) {
       this.setState({ errorMessage: "Passwords don't match" });
-    } else if (email === "" || password === "") {
+    } else if (username === "" || password === "") {
       this.setState({ errorMessage: "Cannot have an empty username or password!" });
     } else {
-      post("/auth/register", { email, password })
+      post("/auth/register", { username, password })
         .then((user) => {
           this.props.login(user);
         })
         .catch((error) => {
           if (error.status === 403) {
-            this.setState({ errorMessage: "Email already exists" });
+            this.setState({ errorMessage: "Username already exists" });
           }
         });
     }
@@ -61,42 +62,46 @@ class LocalAuth extends Component {
 
   render() {
     return (
-      <div>
-        <input onChange={this.handleChange} type="email" name="email" placeholder="Email"></input>
-        <input
+      <Form className="auth-container">
+        <Input
+          className="login-input"
+          onChange={this.handleChange}
+          name="username"
+          placeholder="Username"
+        />
+        <Input
+          className="login-input"
           onChange={this.handleChange}
           type="password"
           name="password"
           placeholder="Password"
-        ></input>
+        />
         {this.state.isRegistering ? (
           <>
-            <input
+            <Input
+              className="login-input"
               onChange={this.handleChange}
               type="password"
               name="passwordConfirm"
-              placeholder="Confirm Password"
-            ></input>
-
-            <div className="u-link" onClick={this.attemptRegister}>
-              Register
-            </div>
-            <div className="u-link" onClick={this.toggleRegistrationStatus}>
-              Have an account?
+              placeholder="Confirm password"
+            />
+            <div className="auth-buttons">
+              <Button content="Register" onClick={this.attemptRegister} />
+              <Button content="Have an account?" onClick={this.toggleRegistrationStatus} />
             </div>
           </>
         ) : (
-          <>
-            <div className="u-link" onClick={this.attemptLogin}>
-              Login
-            </div>
-            <div className="u-link" onClick={this.toggleRegistrationStatus}>
-              Register?
-            </div>
-          </>
+          <div className="auth-buttons">
+            <Button content="Log in" className="login-button" onClick={this.attemptLogin} />
+            <Button
+              content="Register"
+              className="login-button"
+              onClick={this.toggleRegistrationStatus}
+            />
+          </div>
         )}
         <div>{this.state.errorMessage}</div>
-      </div>
+      </Form>
     );
   }
 }

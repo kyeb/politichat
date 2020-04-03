@@ -9,24 +9,24 @@
 
 const express = require("express");
 
-const logger = require("pino")(); // import pino logger
+const logger = require("pino")(); // use pino logger
 
 // import models so we can interact with the database
 const User = require("./models/user");
-
-//add error handling to async endpoints
-const { decorateRouter } = require("@awaitjs/express");
+const Room = require("./models/room");
 
 // api endpoints: all these paths will be prefixed with "/api/"
-const router = decorateRouter(express.Router());
+const router = express.Router();
 
-// |------------------------------|
-// | write your API methods below!|
-// |------------------------------|
-
-router.getAsync("/example", async (req, res, next) => {
+router.get("/example", (req, res, next) => {
   logger.info("Log Hello World");
   res.send({ hello: "world" });
+});
+
+router.get("/rooms", (req, res) => {
+  Room.find({}).then((rooms) => {
+    res.send(rooms);
+  });
 });
 
 // anything else falls to this "not found" case

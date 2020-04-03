@@ -14,7 +14,7 @@
 */
 
 //get environment variables configured
-require('dotenv').config()
+require("dotenv").config();
 
 //import libraries needed for the webserver to work!
 const http = require("http");
@@ -22,7 +22,7 @@ const express = require("express"); // backend framework for our node server.
 
 // library that stores info about each connected user
 const session = require("express-session")({
-  secret: "my-secret",
+  secret: "secret!!!",
   resave: false,
   saveUninitialized: true,
 });

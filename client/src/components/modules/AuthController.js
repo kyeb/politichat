@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { get } from "../../utilities";
 import LocalAuth from "./LocalAuth";
+import { Button } from "semantic-ui-react";
 
 /**
  * Proptypes
@@ -23,7 +24,6 @@ class AuthController extends Component {
   };
 
   logout = () => {
-    console.log("logging out...");
     get("/auth/logout").then(() => {
       this.props.logout();
     });
@@ -35,13 +35,9 @@ class AuthController extends Component {
     return (
       <>
         {loggedIn ? (
-          <div className="u-link" onClick={this.logout}>
-            Logout
-          </div>
+          <Button content="Log out" className="auth-logout" onClick={this.logout} />
         ) : (
-          <>
-            <LocalAuth login={this.login} disabled={disabled} />
-          </>
+          <LocalAuth login={this.login} disabled={disabled} />
         )}
       </>
     );
