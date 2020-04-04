@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 
 import AuthController from "../modules/AuthController";
+import VideoChat from "../modules/VideoChat";
 
 class Home extends Component {
   constructor(props) {
@@ -23,7 +24,11 @@ class Home extends Component {
       />
     );
 
-    return <div>{this.props.user ? <p>test</p> : authController}</div>;
+    const homePage = <VideoChat user={this.props.user} />;
+
+    // Render the homePage if this.props.user exists (user is logged in),
+    //   else render login page
+    return <div>{this.props.user ? homePage : authController}</div>;
   }
 }
 
