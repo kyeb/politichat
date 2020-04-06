@@ -21,10 +21,8 @@ module.exports = {
       next();
     });
     io.on("connection", async (socket) => {
-      if (socket.userId) { 
-        const userObj = await User
-          .findById(socket.userId)
-          .select("-password");
+      if (socket.userId) {
+        const userObj = await User.findById(socket.userId).select("-password");
         socket.emit("user", userObj.toJSON());
       }
     });

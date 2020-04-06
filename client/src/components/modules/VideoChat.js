@@ -1,54 +1,40 @@
 import React, { Component } from "react";
+import { Loader } from "semantic-ui-react";
 
 class VideoChat extends Component {
   constructor(props) {
     super(props);
     // Initialize Default State
     this.state = {
-      localVideo: null,
+      loading: true,
+      api: null,
     };
-    this.videoRef = React.createRef();
   }
 
-  initializeLocalVideo = () => {
-    const constraints = {
-      video: true,
-      // Settings for higher quality audio
-      audio: {
-        sampleRate: 48000,
-        sampleSize: 16,
-      },
-    };
-
-    // Request webcam/audio access from user
-    navigator.mediaDevices
-      .getUserMedia(constraints)
-      .then((mediaStream) => {
-        this.setState({ localVideo: mediaStream });
-      })
-      .catch((err) => console.log(err));
+  handleVideoJoined = () => {
+    console.log("IT WORKED");
+    this.setState({ loading: false });
   };
 
   componentDidMount() {
-    this.initializeLocalVideo();
+    const jitsiDomain = "meet.jit.si";
+    const jitsiOptions = {
+      roomName: "testRoomName",
+      height: 500,
+      parentNode: this.jitsiContainer,
+    };
+
+    const api = new JitsiMeetExternalAPI(jitsiDomain, jitsiOptions);
+    api.on("videoConferenceJoined", this.handleVideoJoined);
+    this.setState({ api: api });
   }
 
   render() {
     return (
-      <div>
-        {/* Set to muted later */}
-        <h2>self video:</h2>
-        {this.state.localVideo && (
-          <video
-            id="localVideo"
-            autoPlay
-            ref={(video) => {
-              if (video) video.srcObject = this.state.localVideo;
-            }}
-          ></video>
-        )}
-        {/* <video id="remoteVideo" autoPlay></video> */}
-      </div>
+      <>
+        <Loader active={this.state.loading} />
+        <div className="jitsi-container" ref={(el) => (this.jitsiContainer = el)} />
+      </>
     );
   }
 }
