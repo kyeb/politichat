@@ -22,6 +22,30 @@ class VideoChat extends Component {
       roomName: "testRoomName",
       height: 500,
       parentNode: this.jitsiContainer,
+      interfaceConfigOverwrite: {
+        // Jitsi asks that you show their watermark if you're using their servers.
+        //   Attempt to deploy a Jitsi server sometime, else leave this
+        // SHOW_JITSI_WATERMARK: false,
+        TOOLBAR_BUTTONS: [
+          "microphone",
+          "camera",
+          "fullscreen",
+          "fodeviceselection",
+          "hangup",
+          "profile",
+          "recording",
+          "etherpad",
+          "settings",
+          "filmstrip",
+          "feedback",
+          "shortcuts",
+          "videobackgroundblur",
+          "download",
+          "help",
+          "mute-everyone",
+        ],
+        VIDEO_QUALITY_LABEL_DISABLED: true,
+      },
     };
 
     const api = new JitsiMeetExternalAPI(jitsiDomain, jitsiOptions);
