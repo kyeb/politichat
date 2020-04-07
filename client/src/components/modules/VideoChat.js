@@ -17,15 +17,16 @@ class VideoChat extends Component {
   };
 
   componentDidMount() {
-    const jitsiDomain = "meet.jit.si";
+    const jitsiDomain = "jitsi.kyeburchard.com";
     const jitsiOptions = {
       roomName: "testRoomName",
       height: 500,
       parentNode: this.jitsiContainer,
       interfaceConfigOverwrite: {
-        // Jitsi asks that you show their watermark if you're using their servers.
-        //   Attempt to deploy a Jitsi server sometime, else leave this
-        // SHOW_JITSI_WATERMARK: false,
+        // Documentation for these options: https://github.com/jitsi/jitsi-meet/blob/master/interface_config.js
+        SHOW_JITSI_WATERMARK: false,
+        SHOW_WATERMARK_FOR_GUESTS: false,
+        DEFAULT_REMOTE_DISPLAY_NAME: "",
         TOOLBAR_BUTTONS: [
           "microphone",
           "camera",
