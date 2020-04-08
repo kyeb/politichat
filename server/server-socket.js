@@ -26,6 +26,7 @@ module.exports = {
         socket.emit("user", userObj.toJSON());
       }
     });
+    require("./server-video");
   },
 
   getIo: () => io,
