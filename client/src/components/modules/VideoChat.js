@@ -6,20 +6,16 @@ class VideoChat extends Component {
     super(props);
     // Initialize Default State
     this.state = {
-      loading: true,
       api: null,
     };
   }
 
-  handleVideoJoined = () => {
-    console.log("IT WORKED");
-    this.setState({ loading: false });
-  };
+  handleVideoJoined = () => {};
 
   componentDidMount() {
     const jitsiDomain = "jitsi.kyeburchard.com";
     const jitsiOptions = {
-      roomName: "testRoomName",
+      roomName: this.props.room.id,
       height: 500,
       parentNode: this.jitsiContainer,
       interfaceConfigOverwrite: {
@@ -57,7 +53,7 @@ class VideoChat extends Component {
   render() {
     return (
       <>
-        <Loader active={this.state.loading} />
+        <h2>here's the video chat component</h2>
         <div className="jitsi-container" ref={(el) => (this.jitsiContainer = el)} />
       </>
     );

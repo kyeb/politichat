@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 
 import AuthController from "../modules/AuthController";
-import VideoChat from "../modules/VideoChat";
 import RoomList from "../modules/RoomList";
+import { Button, Form } from "semantic-ui-react";
+import { post } from "../../utilities";
+import { navigate } from "@reach/router";
 
 class Home extends Component {
   constructor(props) {
@@ -14,6 +16,16 @@ class Home extends Component {
   componentDidMount() {
     // remember -- api calls go here!
   }
+
+  handleNewRoom = () => {
+    post("/api/newroom", {})
+      .then((room) => {
+        navigate(`/room/${room.id}`);
+      })
+      .catch((err) => {
+        navigate("/room/error");
+      });
+  };
 
   render() {
     const loggedOutLanding = (
@@ -28,7 +40,13 @@ class Home extends Component {
       </>
     );
 
-    const loggedInLanding = <VideoChat user={this.props.user} />;
+    const loggedInLanding = (
+      <div className="newroom-container">
+        <Form>
+          <Button onClick={this.handleNewRoom}>Create room</Button>
+        </Form>
+      </div>
+    );
 
     // Render the homePage if this.props.user exists (user is logged in),
     //   else render login page

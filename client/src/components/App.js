@@ -10,6 +10,7 @@ import { socket } from "../client-socket.js";
 import NotFound from "./pages/NotFound.js";
 import Home from "./pages/Home.js";
 import AuthController from "./modules/AuthController";
+import Room from "./pages/Room";
 
 /**
  * Define the "App" component as a class.
@@ -57,6 +58,7 @@ class App extends Component {
         </header>
         <Router>
           <Home path="/" setUser={this.setUser} logout={this.handleLogout} user={this.state.user} />
+          <Room path="/room/:roomId" />
           <NotFound default />
         </Router>
         <footer>
