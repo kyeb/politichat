@@ -2,6 +2,7 @@ import React, { Component } from "react";
 
 import AuthController from "../modules/AuthController";
 import VideoChat from "../modules/VideoChat";
+import RoomList from "../modules/RoomList";
 
 class Home extends Component {
   constructor(props) {
@@ -15,20 +16,23 @@ class Home extends Component {
   }
 
   render() {
-    const authController = (
-      <AuthController
-        logout={this.props.logout}
-        loggedIn={this.props.user !== undefined}
-        setUser={this.props.setUser}
-        providers={["google"]}
-      />
+    const loggedOutLanding = (
+      <>
+        <AuthController
+          logout={this.props.logout}
+          loggedIn={this.props.user !== undefined}
+          setUser={this.props.setUser}
+          providers={["google"]}
+        />
+        <RoomList />
+      </>
     );
 
-    const homePage = <VideoChat user={this.props.user} />;
+    const loggedInLanding = <VideoChat user={this.props.user} />;
 
     // Render the homePage if this.props.user exists (user is logged in),
     //   else render login page
-    return <div>{this.props.user ? homePage : authController}</div>;
+    return <div>{this.props.user ? loggedInLanding : loggedOutLanding}</div>;
   }
 }
 
