@@ -36,6 +36,7 @@ class Room extends Component {
   };
 
   render() {
+    // Set up a video chat if we got a room back from API, otherwise show loader
     let jitsi;
     if (this.state.room && this.state.room.id) {
       jitsi = <VideoChat room={this.state.room} />;

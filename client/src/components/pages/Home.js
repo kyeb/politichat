@@ -17,7 +17,7 @@ class Home extends Component {
   componentDidMount() {}
 
   handleNewRoom = () => {
-    post("/api/newroom", { roomName: this.state.roomName })
+    post("/api/newroom", { roomName: this.state.newRoomName })
       .then((room) => {
         navigate(`/room/${room.id}`);
       })

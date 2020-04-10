@@ -33,7 +33,9 @@ class RoomList extends Component {
     return (
       <>
         <h2>Open rooms</h2>
-        <Table celled>{availableRooms}</Table>
+        <Table celled>
+          <Table.Body>{availableRooms}</Table.Body>
+        </Table>
       </>
     );
   }
