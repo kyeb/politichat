@@ -14,13 +14,25 @@ class Room extends Component {
   }
 
   componentDidMount() {
-    get("/api/rooms", { roomId: this.props.roomId }).then((room) => {
+    get("/api/room", { id: this.props.roomId }).then((room) => {
       this.setState({ room });
     });
   }
 
-  goHome = () => {
-    navigate("/");
+  participantController = () => {
+    return (
+      <div className="controller-participant">
+        <Button onClick={() => navigate(`/exit/${this.props.roomId}`)}>Leave Room</Button>
+      </div>
+    );
+  };
+
+  ownerController = () => {
+    return (
+      <div className="controller-owner">
+        <Button>Next participant</Button>
+      </div>
+    );
   };
 
   render() {
@@ -31,9 +43,16 @@ class Room extends Component {
       jitsi = <Loader active />;
     }
 
+    let controller;
+    if (this.props.user && this.state.room && this.props.user == this.state.room.owner) {
+      controller = this.ownerController();
+    } else {
+      controller = this.participantController();
+    }
+
     return (
       <>
-        <Button onClick={this.goHome}>Leave Room</Button>
+        {controller}
         {jitsi}
       </>
     );

@@ -2,23 +2,22 @@ import React, { Component } from "react";
 
 import AuthController from "../modules/AuthController";
 import RoomList from "../modules/RoomList";
-import { Button, Form } from "semantic-ui-react";
+import { Button, Form, Input } from "semantic-ui-react";
 import { post } from "../../utilities";
 import { navigate } from "@reach/router";
 
 class Home extends Component {
   constructor(props) {
     super(props);
-    // Initialize Default State
-    this.state = {};
+    this.state = {
+      newRoomName: "",
+    };
   }
 
-  componentDidMount() {
-    // remember -- api calls go here!
-  }
+  componentDidMount() {}
 
   handleNewRoom = () => {
-    post("/api/newroom", {})
+    post("/api/newroom", { roomName: this.state.roomName })
       .then((room) => {
         navigate(`/room/${room.id}`);
       })
@@ -43,7 +42,15 @@ class Home extends Component {
     const loggedInLanding = (
       <div className="newroom-container">
         <Form>
-          <Button onClick={this.handleNewRoom}>Create room</Button>
+          <Input
+            className="newroom-name"
+            placeholder="Room name"
+            onChange={(event) => this.setState({ newRoomName: event.target.value })}
+            value={this.state.newRoomName}
+          />
+          <Button className="newroom-button" onClick={this.handleNewRoom}>
+            Create room
+          </Button>
         </Form>
       </div>
     );

@@ -30,7 +30,12 @@ class RoomList extends Component {
       availableRooms.push(<RoomListEntry room={room} key={index} />);
     }
 
-    return <Table celled>{availableRooms}</Table>;
+    return (
+      <>
+        <h2>Open rooms</h2>
+        <Table celled>{availableRooms}</Table>
+      </>
+    );
   }
 }
 
