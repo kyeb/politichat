@@ -15,31 +15,22 @@ class VideoChat extends Component {
   componentDidMount() {
     const jitsiDomain = "jitsi.kyeburchard.com";
     const jitsiOptions = {
-      roomName: this.props.room.id,
+      roomName: this.props.room.roomName,
       height: 500,
       parentNode: this.jitsiContainer,
       interfaceConfigOverwrite: {
         // Documentation for these options: https://github.com/jitsi/jitsi-meet/blob/master/interface_config.js
         SHOW_JITSI_WATERMARK: false,
         SHOW_WATERMARK_FOR_GUESTS: false,
-        DEFAULT_REMOTE_DISPLAY_NAME: "",
+        DEFAULT_REMOTE_DISPLAY_NAME: "Participant",
         TOOLBAR_BUTTONS: [
           "microphone",
           "camera",
           "fullscreen",
           "fodeviceselection",
-          "hangup",
           "profile",
-          "recording",
-          "etherpad",
           "settings",
           "filmstrip",
-          "feedback",
-          "shortcuts",
-          "videobackgroundblur",
-          "download",
-          "help",
-          "mute-everyone",
         ],
         VIDEO_QUALITY_LABEL_DISABLED: true,
       },
@@ -53,7 +44,7 @@ class VideoChat extends Component {
   render() {
     return (
       <>
-        <h2>here's the video chat component</h2>
+        <h2></h2>
         <div className="jitsi-container" ref={(el) => (this.jitsiContainer = el)} />
       </>
     );

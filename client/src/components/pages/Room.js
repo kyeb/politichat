@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { navigate } from "@reach/router";
-import { Button, Loader } from "semantic-ui-react";
+import { Button, Loader, Message, Divider } from "semantic-ui-react";
 
 import VideoChat from "../modules/VideoChat";
 import { get } from "../../utilities";
@@ -10,13 +10,18 @@ class Room extends Component {
     super(props);
     this.state = {
       room: null,
+      error: false,
     };
   }
 
   componentDidMount() {
-    get("/api/room", { id: this.props.roomId }).then((room) => {
-      this.setState({ room });
-    });
+    get("/api/room", { id: this.props.roomId })
+      .then((room) => {
+        this.setState({ room });
+      })
+      .catch((err) => {
+        this.setState({ error: true });
+      });
   }
 
   participantController = () => {
@@ -30,12 +35,31 @@ class Room extends Component {
   ownerController = () => {
     return (
       <div className="controller-owner">
-        <Button>Next participant</Button>
+        note: these buttons don't do anything yet <br />
+        <Button primary onClick={this.handleNext}>
+          Next participant
+        </Button>
+        <Button negative onClick={this.handleEnd}>
+          End session
+        </Button>
       </div>
     );
   };
 
+  handleNext = () => {};
+
+  handleEnd = () => {};
+
   render() {
+    if (this.state.error) {
+      return (
+        <>
+          <Message negative>Sorry, this room does not seem to exist right now :/</Message>
+          <Button onClick={() => navigate("/")}>Go home</Button>
+        </>
+      );
+    }
+
     // Set up a video chat if we got a room back from API, otherwise show loader
     let jitsi;
     if (this.state.room && this.state.room.id) {
@@ -45,7 +69,7 @@ class Room extends Component {
     }
 
     let controller;
-    if (this.props.user && this.state.room && this.props.user == this.state.room.owner) {
+    if (this.props.user && this.state.room && this.props.user.username === this.state.room.user) {
       controller = this.ownerController();
     } else {
       controller = this.participantController();

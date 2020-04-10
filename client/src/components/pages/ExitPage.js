@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Loader, Button } from "semantic-ui-react";
+import { Loader, Button, Divider } from "semantic-ui-react";
 import { get } from "../../utilities";
 import { navigate } from "@reach/router";
 
@@ -18,16 +18,16 @@ class ExitPage extends Component {
   }
 
   render() {
-    // if (this.state.room) {
-    return (
-      <>
-        <div>Thank you for chatting with {/*this.state.room.owner*/}!</div>
-        <Button onClick={() => navigate("/")} content="Exit" />
-      </>
-    );
-    // } else {
-    //   return <Loader active />;
-    // }
+    if (this.state.room) {
+      return (
+        <>
+          <h3>Thank you for chatting with {this.state.room.user}!</h3>
+          <Button onClick={() => navigate("/")} content="Exit" />
+        </>
+      );
+    } else {
+      return <Loader active />;
+    }
   }
 }
 

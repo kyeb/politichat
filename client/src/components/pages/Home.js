@@ -22,7 +22,7 @@ class Home extends Component {
         navigate(`/room/${room.id}`);
       })
       .catch((err) => {
-        navigate("/room/error");
+        alert("Something went wrong! Try a different name or reloading.");
       });
   };
 
@@ -40,19 +40,23 @@ class Home extends Component {
     );
 
     const loggedInLanding = (
-      <div className="newroom-container">
-        <Form>
-          <Input
-            className="newroom-name"
-            placeholder="Room name"
-            onChange={(event) => this.setState({ newRoomName: event.target.value })}
-            value={this.state.newRoomName}
-          />
-          <Button className="newroom-button" onClick={this.handleNewRoom}>
-            Create room
-          </Button>
-        </Form>
-      </div>
+      <>
+        <div className="newroom-container">
+          <h2>Create a new room</h2>
+          <Form>
+            <Input
+              className="newroom-name"
+              placeholder="Room name"
+              onChange={(event) => this.setState({ newRoomName: event.target.value })}
+              value={this.state.newRoomName}
+            />
+            <Button className="newroom-button" onClick={this.handleNewRoom}>
+              Create room
+            </Button>
+          </Form>
+        </div>
+        <RoomList />
+      </>
     );
 
     // Render the homePage if this.props.user exists (user is logged in),
