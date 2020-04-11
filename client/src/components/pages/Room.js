@@ -69,7 +69,7 @@ class Room extends Component {
     }
 
     let controller;
-    if (this.props.user && this.state.room && this.props.user.username === this.state.room.user) {
+    if (this.props.user && this.state.room && this.props.user.username === this.state.room.owner) {
       controller = this.ownerController();
     } else {
       controller = this.participantController();

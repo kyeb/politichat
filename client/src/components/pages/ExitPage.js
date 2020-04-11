@@ -21,7 +21,7 @@ class ExitPage extends Component {
     if (this.state.room) {
       return (
         <>
-          <h3>Thank you for chatting with {this.state.room.user}!</h3>
+          <h3>Thank you for chatting with {this.state.room.owner}!</h3>
           <Button onClick={() => navigate("/")} content="Exit" />
         </>
       );

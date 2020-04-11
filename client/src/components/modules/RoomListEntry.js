@@ -15,7 +15,7 @@ class RoomListEntry extends Component {
     return (
       <>
         <Table.Row>
-          <Table.Cell>{this.props.room.user}</Table.Cell>
+          <Table.Cell>{this.props.room.owner}</Table.Cell>
           <Table.Cell>{this.props.room.roomName}</Table.Cell>
           <Table.Cell>
             <Button onClick={this.goTo} primary>
