@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { get } from "../../utilities";
+import { get, post } from "../../utilities";
 import LocalAuth from "./LocalAuth";
 import { Button } from "semantic-ui-react";
+import { socket } from "../../client-socket";
 
 /**
  * Proptypes
@@ -21,6 +22,7 @@ class AuthController extends Component {
 
   login = (user) => {
     this.props.setUser(user);
+    post("/api/initsocket", { socketid: socket.id });
   };
 
   logout = () => {

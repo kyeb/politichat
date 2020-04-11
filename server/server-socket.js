@@ -52,13 +52,17 @@ module.exports = {
         const userObj = await User.findById(socket.userId).select("-password");
         socket.emit("user", userObj.toJSON());
       }
+      socket.on("disconnect", (reason) => {
+        const user = getUserFromSocketID(socket.id);
+        removeUser(user, socket);
+      });
     });
   },
 
   addUser: addUser,
   removeUser: removeUser,
 
-  getSocketFromUserID: getSocketFromUsername,
+  getSocketFromUsername: getSocketFromUsername,
   getUserFromSocketID: getUserFromSocketID,
   getSocketFromSocketID: getSocketFromSocketID,
   getAllConnectedUsers: getAllConnectedUsers,

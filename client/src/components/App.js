@@ -10,7 +10,7 @@ import { socket } from "../client-socket.js";
 import NotFound from "./pages/NotFound.js";
 import Home from "./pages/Home.js";
 import AuthController from "./modules/AuthController";
-import Room from "./pages/Room";
+import RoomContainer from "./pages/Room";
 import ExitPage from "./pages/ExitPage";
 import { Divider } from "semantic-ui-react";
 
@@ -62,7 +62,7 @@ class App extends Component {
         <Divider />
         <Router>
           <Home path="/" setUser={this.setUser} logout={this.handleLogout} user={this.state.user} />
-          <Room path="/room/:roomId" user={this.state.user} />
+          <RoomContainer path="/room/:roomId" user={this.state.user} />
           <ExitPage path="/exit/:roomId" user={this.state.user} />
           <NotFound default />
         </Router>

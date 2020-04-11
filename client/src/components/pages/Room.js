@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import { navigate } from "@reach/router";
-import { Button, Loader, Message, Divider } from "semantic-ui-react";
+import { Button, Message, Loader } from "semantic-ui-react";
 
-import VideoChat from "../modules/VideoChat";
 import { get } from "../../utilities";
+import HostRoom from "./HostRoom";
+import UserRoom from "./UserRoom";
 
-class Room extends Component {
+class RoomContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -19,36 +20,10 @@ class Room extends Component {
       .then((room) => {
         this.setState({ room });
       })
-      .catch((err) => {
+      .catch(() => {
         this.setState({ error: true });
       });
   }
-
-  participantController = () => {
-    return (
-      <div className="controller-participant">
-        <Button onClick={() => navigate(`/exit/${this.props.roomId}`)}>Leave Room</Button>
-      </div>
-    );
-  };
-
-  ownerController = () => {
-    return (
-      <div className="controller-owner">
-        note: these buttons don't do anything yet <br />
-        <Button primary onClick={this.handleNext}>
-          Next participant
-        </Button>
-        <Button negative onClick={this.handleEnd}>
-          End session
-        </Button>
-      </div>
-    );
-  };
-
-  handleNext = () => {};
-
-  handleEnd = () => {};
 
   render() {
     if (this.state.error) {
@@ -60,28 +35,17 @@ class Room extends Component {
       );
     }
 
-    // Set up a video chat if we got a room back from API, otherwise show loader
-    let jitsi;
-    if (this.state.room && this.state.room.id) {
-      jitsi = <VideoChat room={this.state.room} />;
-    } else {
-      jitsi = <Loader active />;
-    }
-
-    let controller;
+    let room;
     if (this.props.user && this.state.room && this.props.user.username === this.state.room.owner) {
-      controller = this.ownerController();
+      room = <HostRoom room={this.state.room} />;
+    } else if (this.state.room) {
+      room = <UserRoom room={this.state.room} />;
     } else {
-      controller = this.participantController();
+      room = <Loader />;
     }
 
-    return (
-      <>
-        {controller}
-        {jitsi}
-      </>
-    );
+    return room;
   }
 }
 
-export default Room;
+export default RoomContainer;

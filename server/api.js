@@ -65,13 +65,29 @@ router.get("/room", (req, res) => {
   res.send(rooms.find((e) => e.id === req.query.id));
 });
 
-router.post("/join", (req, res) => {
-  // adds a user's socket to the queue for the given room
-  const roomIndex = rooms.findIndex((e) => e.id === req.body.id);
-  rooms[roomIndex].queue.push(req.user.username);
+function removeFromQueue(roomID, userSocketID) {
+  const room = rooms.find((e) => e.id === roomID);
+  room.queue = room.queue.filter((e) => e !== userSocketID);
+  logger.info(`User ${userSocketID} has left the queue`);
+  socket.getSocketFromUsername(room.owner).emit("queue status", room.queue.length);
+}
 
-  // tell the owner to enable the "next" button, since someone is in the queue
-  socket.getSocketFromUsername(room.owner).emit("queue ready");
+router.post("/join", (req, res) => {
+  // adds a user's socketID to the queue for the given room
+  const userSocket = socket.getSocketFromSocketID(req.body.socketID);
+  const room = rooms.find((e) => e.id === req.body.roomID);
+  room.queue.push(userSocket.id);
+  logger.info(`User ${userSocket.id} has joined the queue`);
+
+  // set up a callback so that if the user disconnects, they get removed from
+  //   the queue
+  userSocket.on("disconnect", () => {
+    removeFromQueue(room.id, userSocket.id);
+  });
+
+  // tell the room owner how many people are in the queue
+  socket.getSocketFromUsername(room.owner).emit("queue status", room.queue.length);
+
   res.send({ success: true });
 });
 
@@ -83,8 +99,19 @@ router.post("/next", (req, res) => {
     return;
   }
 
+  // fail if nobody in queue; the "next" button should be disabled in frontend until someone is
+  //   there, so this shouldn't be happen
+  if (room.queue.length === 0) {
+    res.send({ success: false });
+    return;
+  }
+
   // tell the first user in the queue they can connect
-  socket.getSocketFromUsername(room.queue.shift()).emit("host ready");
+  const userSocketID = room.queue.shift();
+  socket.getSocketFromSocketID(userSocketID).emit("host ready");
+
+  // let the host know the queue length again, so they can update it
+  socket.getSocketFromUsername(room.owner).emit("queue status", room.queue.length);
 
   res.send({ success: true });
 });

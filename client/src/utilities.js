@@ -67,3 +67,8 @@ export function post(endpoint, params = {}) {
       throw error;
     });
 }
+
+export function error(error, message) {
+  alert(`Sorry, something went wrong.  See the console for more details. \n\n${message}`);
+  console.log(error);
+}
