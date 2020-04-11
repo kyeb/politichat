@@ -22,15 +22,35 @@ let rooms = [];
 // api endpoints: all these paths will be prefixed with "/api/"
 const router = express.Router();
 
+function isValid(str){
+  var check = new RegExp(/[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/); 
+  if(check.test(str)){
+    return false;
+  }
+  return true; 
+}
+
 router.post("/newroom", (req, res) => {
   // error if room with same name already exists
-  if (rooms.find((room) => room.roomName === req.body.roomName)) {
+  if (rooms.find((room) => room.roomName === req.body.roomName)){
     res.status(400).send({ msg: "Room with that name already exists" });
     return;
   }
 
-  // generate random room ID number
-  const roomID = Math.random().toString(36);
+  // error if room name includes quotation marks
+  if (isValid(req.body.roomName) === false) {
+    res.status(400).send({ statusMessage: "Room name cannot include special characters"});
+    return;
+  }
+
+  // error if room name is empty
+  if (req.body.roomName === "") {
+    res.status(400).send({ statusMessage: "Room name cannot be empty" });
+    return;
+  }
+
+  // generate random room ID number  
+  const roomID = Math.random().toString(36).substr(2,9)
 
   // make a room object with keys id, roomName, user
   const room_temp = {
@@ -47,11 +67,17 @@ router.post("/newroom", (req, res) => {
   res.send(room_temp);
 });
 
-router.get("/deleteroom", (req, res) => {
-  // delete a room by its ID from the array rooms
+router.post("/end", (req, res) => {
+  // delete a room by its ID from the array of active rooms
+  const length = rooms.length;
   rooms = rooms.filter(function (e) {
-    return e.id !== req.query.id;
+    return e.id !== req.body.id;
   });
+ 
+  // sends true if was successful, false if not
+  if(rooms.length == length){
+    res.send({ success: false });}
+  res.send({ success: true });
 });
 
 router.get("/rooms", (req, res) => {

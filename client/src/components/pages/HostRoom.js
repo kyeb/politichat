@@ -35,8 +35,12 @@ class HostRoom extends Component {
 
   handleEnd = () => {
     post("/api/end", { id: this.props.room.id })
-      .then(() => {
-        navigate("/");
+      .then((res) => {
+        if (res.success) {
+          navigate("/");
+        } else {
+          error(res, "did not delete from array")
+        } 
       })
       .catch((err) => {
         error(err, "POST to /api/end failed.");
