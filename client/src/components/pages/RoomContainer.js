@@ -5,7 +5,6 @@ import { Button, Message, Loader } from "semantic-ui-react";
 import { get } from "../../utilities";
 import HostRoom from "./HostRoom";
 import UserRoom from "./UserRoom";
-import { socket } from "../../client-socket";
 
 class RoomContainer extends Component {
   constructor(props) {

@@ -33,7 +33,7 @@ class UserRoom extends Component {
   }
 
   roomGone() {
-    navigate(`/exit/roomgone/${this.props.room.id}`);
+    navigate("/exit/roomgone/null");
   }
 
   exitLine() {

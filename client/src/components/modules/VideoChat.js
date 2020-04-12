@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { Loader } from "semantic-ui-react";
 
 class VideoChat extends Component {
   constructor(props) {
@@ -16,7 +15,7 @@ class VideoChat extends Component {
     const jitsiDomain = "jitsi.kyeburchard.com";
     const jitsiOptions = {
       roomName: this.props.room.roomName,
-      height: 500,
+      height: 0.75 * window.innerHeight,
       parentNode: this.jitsiContainer,
       interfaceConfigOverwrite: {
         // Documentation for these options: https://github.com/jitsi/jitsi-meet/blob/master/interface_config.js

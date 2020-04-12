@@ -12,9 +12,6 @@ const socket = require("./server-socket");
 
 const logger = require("pino")(); // use pino logger
 
-// import models so we can interact with the database
-const User = require("./models/user");
-
 // array to store rooms
 let rooms = [];
 

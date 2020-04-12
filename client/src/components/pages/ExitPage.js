@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Loader, Button, Divider, Message } from "semantic-ui-react";
+import { Loader, Button, Message } from "semantic-ui-react";
 import { get, error } from "../../utilities";
 import { navigate } from "@reach/router";
 
@@ -12,7 +12,7 @@ class ExitPage extends Component {
   }
 
   componentDidMount() {
-    if (this.props.roomID) {
+    if (this.props.roomId !== "null") {
       get("/api/room", { id: this.props.roomId })
         .then((room) => {
           this.setState({ room });

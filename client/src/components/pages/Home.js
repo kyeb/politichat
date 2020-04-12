@@ -22,7 +22,9 @@ class Home extends Component {
         navigate(`/room/${room.id}`);
       })
       .catch((err) => {
-        alert("Something went wrong! Try a different name or reloading.");
+        alert(
+          "Something went wrong! Try a different name or reloading.\n\nTip: room names cannot contain special characters."
+        );
       });
   };
 
