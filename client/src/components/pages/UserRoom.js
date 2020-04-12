@@ -20,19 +20,19 @@ class UserRoom extends Component {
       this.joinRoom();
     });
     socket.on("leave please", () => {
-      this.exitLine(); 
+      this.exitLine();
     });
     socket.on("room gone", () => {
-      this.gotoHome(); 
-    }); 
+      this.gotoHome();
+    });
   }
 
   gotoHome() {
-    navigate("/"); 
+    navigate("/");
   }
 
   exitLine() {
-    navigate(`/exit/${this.props.room.id}`); 
+    navigate(`/exit/${this.props.room.id}`);
   }
 
   joinRoom = () => {
@@ -49,7 +49,7 @@ class UserRoom extends Component {
 
   render() {
     if (!this.state.ready) {
-      console.log("check"); 
+      console.log("check");
       return (
         <>
           <Button onClick={() => navigate("/")}>Leave queue</Button>

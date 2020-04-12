@@ -10,7 +10,7 @@ import { socket } from "../client-socket.js";
 import NotFound from "./pages/NotFound.js";
 import Home from "./pages/Home.js";
 import AuthController from "./modules/AuthController";
-import RoomContainer from "./pages/Room";
+import RoomContainer from "./pages/RoomContainer";
 import ExitPage from "./pages/ExitPage";
 import { Divider } from "semantic-ui-react";
 
@@ -23,7 +23,11 @@ class App extends Component {
     super(props);
     this.state = {
       user: undefined,
+      socketConnected: false,
     };
+    socket.on("connect", () => {
+      this.setState({ socketConnected: true });
+    });
     socket.on("user", (user) => {
       this.setState({ user });
     });
@@ -62,7 +66,11 @@ class App extends Component {
         <Divider />
         <Router>
           <Home path="/" setUser={this.setUser} logout={this.handleLogout} user={this.state.user} />
-          <RoomContainer path="/room/:roomId" user={this.state.user} />
+          <RoomContainer
+            path="/room/:roomId"
+            user={this.state.user}
+            socketConnected={this.state.socketConnected}
+          />
           <ExitPage path="/exit/:roomId" user={this.state.user} />
           <NotFound default />
         </Router>

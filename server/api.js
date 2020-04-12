@@ -71,8 +71,21 @@ router.post("/newroom", (req, res) => {
 router.post("/end", (req, res) => {
   const room = rooms.find((e) => e.id === req.body.id);
 
-  // tell the old user that they should exit the page 
-  socket.getSocketFromSocketID(room.current).emit("room gone"); 
+  // tell the old user that they should exit the page
+  const userSocket = socket.getSocketFromSocketID(room.current);
+  if (userSocket) {
+    userSocket.emit("room gone");
+  }
+
+  // tell all users in queue to exit the page
+  for (let i = 0; i < room.queue.length; i++) {
+    const queuedSocket = socket.getSocketFromSocketID(room.queue[i]);
+    if (queuedSocket) {
+      // TODO: make this a different message so queued users see a message instead of just
+      //   being kicked from the queue
+      queuedSocket.emit("room gone");
+    }
+  }
 
   // delete a room by its ID from the array of active rooms
   const length = rooms.length;
@@ -110,13 +123,11 @@ function removeFromQueue(roomID, userSocketID) {
 function updateHost(room) {
   const ownerSocket = socket.getSocketFromUsername(room.owner);
   if (ownerSocket) {
-      ownerSocket.emit("queue status", room.queue.length);
+    ownerSocket.emit("queue status", room.queue.length);
   }
 }
 
 router.post("/join", (req, res) => {
-  console.log(rooms);
-  console.log(req.body.socketID);
   // adds a user's socketID to the queue for the given room
   const userSocket = socket.getSocketFromSocketID(req.body.socketID);
   const room = rooms.find((e) => e.id === req.body.roomID);
@@ -149,11 +160,10 @@ router.post("/next", (req, res) => {
     res.send({ success: false });
     return;
   }
-  
-  if (room.current !== null)
-  {
-    // tell the old user that they should exit the page 
-    socket.getSocketFromSocketID(room.current).emit("leave please"); 
+
+  if (room.current && socket.getSocketFromSocketID(room.current)) {
+    // tell the old user that they should exit the page
+    socket.getSocketFromSocketID(room.current).emit("leave please");
   }
 
   room.current = room.queue[0]; // first element is the who to currently connect
@@ -168,26 +178,6 @@ router.post("/next", (req, res) => {
 
   res.send({ success: true });
 });
-
-// TODO: this doesn't work right now since socket.userId is always undefined
-//   For now, assume an owner doesn't disconnect and reconnect
-// io.on("connection", (socket) => {
-//   // when a logged-in user's socket reconnects, remember their socket so we
-//   //   can communicate with them later
-//   console.log("new socket connection");
-//   console.log(socket.userId);
-//   if (socket.userId) {
-//     User.findById(socket.userId).then((user) => {
-//       console.log("found owner");
-//       for (let i = 0; i < rooms.length; i++) {
-//         if (rooms[i].owner === user.username) {
-//           rooms[roomIndex].ownerSocket = socket;
-//           console.log("updating owner socket");
-//         }
-//       }
-//     });
-//   }
-// });
 
 router.get("/example", (req, res) => {
   logger.info("Log Hello World");
