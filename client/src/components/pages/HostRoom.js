@@ -10,7 +10,7 @@ class HostRoom extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      queueLength: 0,
+      queueLength: this.props.room ? this.props.room.queue.length : 0,
     };
     socket.on("queue status", (queueLength) => {
       this.setState({ queueLength });
@@ -37,10 +37,10 @@ class HostRoom extends Component {
     post("/api/end", { id: this.props.room.id })
       .then((res) => {
         if (res.success) {
-          navigate("/");
+          navigate(`/exit/host/${this.props.room.id}`);
         } else {
-          error(res, "did not delete from array")
-        } 
+          error(res, "did not delete from array");
+        }
       })
       .catch((err) => {
         error(err, "POST to /api/end failed.");

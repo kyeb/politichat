@@ -9,7 +9,6 @@
 
 const express = require("express");
 const socket = require("./server-socket");
-const io = socket.getIo();
 
 const logger = require("pino")(); // use pino logger
 
@@ -111,6 +110,10 @@ router.get("/room", (req, res) => {
   res.send(rooms.find((e) => e.id === req.query.id));
 });
 
+router.post("/leavequeue", (req, res) => {
+  removeFromQueue(req.body.roomID, req.body.socketID);
+});
+
 function removeFromQueue(roomID, userSocketID) {
   const room = rooms.find((e) => e.id === roomID);
   // if the room doesn't exist for some reason, exit
@@ -118,6 +121,7 @@ function removeFromQueue(roomID, userSocketID) {
   room.queue = room.queue.filter((e) => e !== userSocketID);
   logger.info(`User ${userSocketID} has left the queue`);
   updateHost(room);
+  updateUsers(room);
 }
 
 function updateHost(room) {
@@ -127,10 +131,26 @@ function updateHost(room) {
   }
 }
 
+function updateUsers(room) {
+  for (let i = 0; i < room.queue.length; i++) {
+    const userSocket = socket.getSocketFromSocketID(room.queue[i]);
+    if (userSocket) {
+      userSocket.emit("position update", i + 1);
+    }
+  }
+}
+
 router.post("/join", (req, res) => {
   // adds a user's socketID to the queue for the given room
   const userSocket = socket.getSocketFromSocketID(req.body.socketID);
   const room = rooms.find((e) => e.id === req.body.roomID);
+  // if the host is trying to join, don't let them
+  if (userSocket === socket.getSocketFromUsername(room.owner)) {
+    updateHost(room);
+    res.send({});
+    return;
+  }
+
   room.queue.push(userSocket.id);
   logger.info(`User ${userSocket.id} has joined the queue`);
 
@@ -142,6 +162,7 @@ router.post("/join", (req, res) => {
 
   // tell the room owner how many people are in the queue
   updateHost(room);
+  updateUsers(room);
 
   res.send({ success: true });
 });
@@ -175,6 +196,7 @@ router.post("/next", (req, res) => {
 
   // let the host know the queue length again, so they can update it
   updateHost(room);
+  updateUsers(room);
 
   res.send({ success: true });
 });

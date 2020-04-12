@@ -11,11 +11,13 @@ class UserRoom extends Component {
     super(props);
     this.state = {
       ready: false,
+      position: null,
     };
     // Let user into the room when the server says it's time
     socket.on("host ready", () => {
       this.setState({ ready: true });
     });
+    // If user reloads page, re-join the room
     socket.on("connect", () => {
       this.joinRoom();
     });
@@ -23,16 +25,20 @@ class UserRoom extends Component {
       this.exitLine();
     });
     socket.on("room gone", () => {
-      this.gotoHome();
+      this.roomGone();
+    });
+    socket.on("position update", (position) => {
+      this.setState({ position });
     });
   }
 
-  gotoHome() {
-    navigate("/");
+  roomGone() {
+    navigate(`/exit/roomgone/${this.props.room.id}`);
   }
 
   exitLine() {
-    navigate(`/exit/${this.props.room.id}`);
+    console.log("exiting line");
+    navigate(`/exit/done/${this.props.room.id}`);
   }
 
   joinRoom = () => {
@@ -49,11 +55,18 @@ class UserRoom extends Component {
 
   render() {
     if (!this.state.ready) {
-      console.log("check");
       return (
         <>
-          <Button onClick={() => navigate("/")}>Leave queue</Button>
-          <div>Waiting in line to speak to {this.props.room.owner}...</div>
+          <Button
+            onClick={() => {
+              post("/api/leavequeue", { roomID: this.props.room.id, socketID: socket.id });
+              navigate("/");
+            }}
+          >
+            Leave queue
+          </Button>
+          <p>Waiting in line to speak to {this.props.room.owner}...</p>
+          {this.state.position && <p>You are position {this.state.position} in line.</p>}
         </>
       );
     }
@@ -68,7 +81,7 @@ class UserRoom extends Component {
 
     const controller = (
       <div className="controller-participant">
-        <Button onClick={() => navigate(`/exit/${this.props.room.id}`)}>Leave Room</Button>
+        <Button onClick={() => navigate(`/exit/done/${this.props.room.id}`)}>Leave Room</Button>
       </div>
     );
 

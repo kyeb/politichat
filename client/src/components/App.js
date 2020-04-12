@@ -71,7 +71,7 @@ class App extends Component {
             user={this.state.user}
             socketConnected={this.state.socketConnected}
           />
-          <ExitPage path="/exit/:roomId" user={this.state.user} />
+          <ExitPage path="/exit/:reason/:roomId" user={this.state.user} />
           <NotFound default />
         </Router>
         <footer>
