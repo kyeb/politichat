@@ -16,17 +16,31 @@ class UserRoom extends Component {
     socket.on("host ready", () => {
       this.setState({ ready: true });
     });
+    socket.on("connect", () => {
+      this.joinRoom();
+    });
   }
 
-  componentDidMount() {
+  joinRoom = () => {
     post("/api/join", { roomID: this.props.room.id, socketID: socket.id })
-      .then((res) => {})
+      .then(() => {})
       .catch((err) => error(err, "Joining room failed"));
+  };
+
+  componentDidMount() {
+    if (socket.id) {
+      this.joinRoom();
+    }
   }
 
   render() {
     if (!this.state.ready) {
-      return <div>Waiting in line to speak to {this.props.room.owner}</div>;
+      return (
+        <>
+          <Button onClick={() => navigate("/")}>Leave queue</Button>
+          <div>Waiting in line to speak to {this.props.room.owner}...</div>
+        </>
+      );
     }
 
     // Set up a video chat if we got a room back from API, otherwise show loader

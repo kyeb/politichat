@@ -22,24 +22,24 @@ let rooms = [];
 // api endpoints: all these paths will be prefixed with "/api/"
 const router = express.Router();
 
-function isValid(str){
-  var check = new RegExp(/[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/); 
-  if(check.test(str)){
+function isValid(str) {
+  var check = new RegExp(/[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/);
+  if (check.test(str)) {
     return false;
   }
-  return true; 
+  return true;
 }
 
 router.post("/newroom", (req, res) => {
   // error if room with same name already exists
-  if (rooms.find((room) => room.roomName === req.body.roomName)){
+  if (rooms.find((room) => room.roomName === req.body.roomName)) {
     res.status(400).send({ msg: "Room with that name already exists" });
     return;
   }
 
   // error if room name includes quotation marks
   if (isValid(req.body.roomName) === false) {
-    res.status(400).send({ statusMessage: "Room name cannot include special characters"});
+    res.status(400).send({ statusMessage: "Room name cannot include special characters" });
     return;
   }
 
@@ -49,8 +49,8 @@ router.post("/newroom", (req, res) => {
     return;
   }
 
-  // generate random room ID number  
-  const roomID = Math.random().toString(36).substr(2,9)
+  // generate random room ID number
+  const roomID = Math.random().toString(36).substr(2, 9);
 
   // make a room object with keys id, roomName, user
   const room_temp = {
@@ -73,10 +73,11 @@ router.post("/end", (req, res) => {
   rooms = rooms.filter(function (e) {
     return e.id !== req.body.id;
   });
- 
+
   // sends true if was successful, false if not
-  if(rooms.length == length){
-    res.send({ success: false });}
+  if (rooms.length == length) {
+    res.send({ success: false });
+  }
   res.send({ success: true });
 });
 
@@ -93,12 +94,23 @@ router.get("/room", (req, res) => {
 
 function removeFromQueue(roomID, userSocketID) {
   const room = rooms.find((e) => e.id === roomID);
+  // if the room doesn't exist for some reason, exit
+  if (!room) return;
   room.queue = room.queue.filter((e) => e !== userSocketID);
   logger.info(`User ${userSocketID} has left the queue`);
-  socket.getSocketFromUsername(room.owner).emit("queue status", room.queue.length);
+  updateHost(room);
+}
+
+function updateHost(room) {
+  const ownerSocket = socket.getSocketFromUsername(room.owner);
+  if (ownerSocket) {
+    ownerSocket.emit("queue status", room.queue.length);
+  }
 }
 
 router.post("/join", (req, res) => {
+  console.log(rooms);
+  console.log(req.body.socketID);
   // adds a user's socketID to the queue for the given room
   const userSocket = socket.getSocketFromSocketID(req.body.socketID);
   const room = rooms.find((e) => e.id === req.body.roomID);
@@ -112,7 +124,7 @@ router.post("/join", (req, res) => {
   });
 
   // tell the room owner how many people are in the queue
-  socket.getSocketFromUsername(room.owner).emit("queue status", room.queue.length);
+  updateHost(room);
 
   res.send({ success: true });
 });
@@ -137,7 +149,7 @@ router.post("/next", (req, res) => {
   socket.getSocketFromSocketID(userSocketID).emit("host ready");
 
   // let the host know the queue length again, so they can update it
-  socket.getSocketFromUsername(room.owner).emit("queue status", room.queue.length);
+  updateHost(room);
 
   res.send({ success: true });
 });

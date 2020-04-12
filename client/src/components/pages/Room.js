@@ -5,14 +5,19 @@ import { Button, Message, Loader } from "semantic-ui-react";
 import { get } from "../../utilities";
 import HostRoom from "./HostRoom";
 import UserRoom from "./UserRoom";
+import { socket } from "../../client-socket";
 
 class RoomContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
       room: null,
+      socketConnected: false,
       error: false,
     };
+    socket.on("connect", () => {
+      this.setState({ socketConnected: true });
+    });
   }
 
   componentDidMount() {
@@ -38,7 +43,7 @@ class RoomContainer extends Component {
     let room;
     if (this.props.user && this.state.room && this.props.user.username === this.state.room.owner) {
       room = <HostRoom room={this.state.room} />;
-    } else if (this.state.room) {
+    } else if (this.state.room && this.state.socketConnected) {
       room = <UserRoom room={this.state.room} />;
     } else {
       room = <Loader />;

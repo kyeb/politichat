@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Loader, Table } from "semantic-ui-react";
+import { Loader, Table, Message } from "semantic-ui-react";
 import { get } from "../../utilities";
 import RoomListEntry from "./RoomListEntry";
 
@@ -28,6 +28,14 @@ class RoomList extends Component {
 
     for (const [index, room] of this.state.rooms.entries()) {
       availableRooms.push(<RoomListEntry room={room} key={index} />);
+    }
+
+    if (availableRooms.length === 0) {
+      return (
+        <Message>
+          Sorry, no available rooms right now. Check back again later, or create one yourself!
+        </Message>
+      );
     }
 
     return (
