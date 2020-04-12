@@ -52,11 +52,12 @@ router.post("/newroom", (req, res) => {
   // generate random room ID number
   const roomID = Math.random().toString(36).substr(2, 9);
 
-  // make a room object with keys id, roomName, user
+  // make a room object with keys id, roomName, owner, current user, and queue
   const room_temp = {
     id: roomID,
     roomName: req.body.roomName,
     owner: req.user.username,
+    current: null,
     queue: [],
   };
 
@@ -68,6 +69,11 @@ router.post("/newroom", (req, res) => {
 });
 
 router.post("/end", (req, res) => {
+  const room = rooms.find((e) => e.id === req.body.id);
+
+  // tell the old user that they should exit the page 
+  socket.getSocketFromSocketID(room.current).emit("room gone"); 
+
   // delete a room by its ID from the array of active rooms
   const length = rooms.length;
   rooms = rooms.filter(function (e) {
@@ -104,7 +110,7 @@ function removeFromQueue(roomID, userSocketID) {
 function updateHost(room) {
   const ownerSocket = socket.getSocketFromUsername(room.owner);
   if (ownerSocket) {
-    ownerSocket.emit("queue status", room.queue.length);
+      ownerSocket.emit("queue status", room.queue.length);
   }
 }
 
@@ -143,10 +149,19 @@ router.post("/next", (req, res) => {
     res.send({ success: false });
     return;
   }
+  
+  if (room.current !== null)
+  {
+    // tell the old user that they should exit the page 
+    socket.getSocketFromSocketID(room.current).emit("leave please"); 
+  }
+
+  room.current = room.queue[0]; // first element is the who to currently connect
+
+  room.queue.shift(); // remove the old user from the array
 
   // tell the first user in the queue they can connect
-  const userSocketID = room.queue.shift();
-  socket.getSocketFromSocketID(userSocketID).emit("host ready");
+  socket.getSocketFromSocketID(room.current).emit("host ready");
 
   // let the host know the queue length again, so they can update it
   updateHost(room);
