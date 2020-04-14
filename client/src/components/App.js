@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Router, navigate } from "@reach/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCommentAlt } from "@fortawesome/free-solid-svg-icons/faCommentAlt";
+import { faCommentAlt } from "@fortawesome/free-solid-svg-icons";
 
 import "../utilities.css";
 import "../styles.css";
