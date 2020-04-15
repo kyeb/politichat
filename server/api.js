@@ -12,11 +12,22 @@ const socket = require("./server-socket");
 
 const logger = require("pino")(); // use pino logger
 
+const User = require("./models/user");
+
 // array to store rooms
 let rooms = [];
 
 // api endpoints: all these paths will be prefixed with "/api/"
 const router = express.Router();
+
+// Admin authorization middleware
+const needsAdmin = (req, res, next) => {
+  if (!req.user || !req.user.admin) {
+    res.status(403).send({ msg: "Admin permissions required" });
+  } else {
+    next();
+  }
+};
 
 function isValid(str) {
   var check = new RegExp(/[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/);
@@ -198,16 +209,50 @@ router.post("/next", (req, res) => {
   res.send({ success: true });
 });
 
-router.get("/example", (req, res) => {
-  logger.info("Log Hello World");
-  res.send({ hello: "world" });
-});
-
 // keep the user-to-socket mapping current, so we know who is who
 router.post("/initsocket", (req, res) => {
   // do nothing if user not logged in
   if (req.user) socket.addUser(req.user, socket.getSocketFromSocketID(req.body.socketid));
   res.send({});
+});
+
+router.get("/users", (req, res) => {
+  User.find({}).then((users) => {
+    res.send(users);
+  });
+});
+
+router.post("/user/admin", [needsAdmin], (req, res) => {
+  if (!req.user || !req.user.admin) {
+    res.status(403).send({ msg: "Admin permissions required" });
+    return;
+  }
+  User.findByIdAndUpdate(req.body.id, { admin: req.body.admin })
+    .then((user) => res.send(user))
+    .catch((err) => {
+      logger.error(err);
+      res.status(500).send({});
+    });
+});
+
+router.post("/user/updatepermissions", [needsAdmin], (req, res) => {
+  User.findByIdAndUpdate(req.body.id, { canCreateRooms: req.body.canCreateRooms })
+    .then((user) => res.send(user))
+    .catch((err) => {
+      logger.error(err);
+      res.status(500).send({});
+    });
+});
+
+router.post("/user/delete", [needsAdmin], (req, res) => {
+  User.findByIdAndDelete(req.body.id)
+    .then(() => {
+      res.send({ success: true });
+    })
+    .catch((err) => {
+      logger.error(err);
+      res.send({ success: false });
+    });
 });
 
 // anything else falls to this "not found" case

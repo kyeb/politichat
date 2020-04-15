@@ -13,6 +13,7 @@ import AuthController from "./modules/AuthController";
 import RoomContainer from "./pages/RoomContainer";
 import ExitPage from "./pages/ExitPage";
 import { Divider } from "semantic-ui-react";
+import AdminPanel from "./pages/AdminPanel";
 
 /**
  * Define the "App" component as a class.
@@ -66,6 +67,7 @@ class App extends Component {
         <Divider />
         <Router>
           <Home path="/" setUser={this.setUser} logout={this.handleLogout} user={this.state.user} />
+          <AdminPanel path="/admin" user={this.state.user} />
           <RoomContainer
             path="/room/:roomId"
             user={this.state.user}

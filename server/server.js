@@ -91,5 +91,5 @@ const server = http.Server(app);
 socket.init(server, session);
 
 server.listen(port, () => {
-  logger.info(`Server running on port: ${port}`);
+  logger.info(`Server running on port ${port}`);
 });
