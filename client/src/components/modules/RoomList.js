@@ -33,7 +33,8 @@ class RoomList extends Component {
     if (availableRooms.length === 0) {
       return (
         <Message>
-          Sorry, no available rooms right now. Check back again later, or create one yourself!
+          Sorry, there are no available public rooms right now. Check back again later, or create
+          one yourself!
         </Message>
       );
     }

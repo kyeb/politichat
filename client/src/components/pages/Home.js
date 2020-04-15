@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import AuthController from "../modules/AuthController";
 import RoomList from "../modules/RoomList";
-import { Button, Form, Input } from "semantic-ui-react";
+import { Button, Form, Input, Message } from "semantic-ui-react";
 import { post } from "../../utilities";
 import { navigate } from "@reach/router";
 
@@ -41,8 +41,9 @@ class Home extends Component {
       </>
     );
 
-    const loggedInLanding = (
-      <>
+    let newRoomForm;
+    if (this.props.user && this.props.user.canCreateRooms) {
+      newRoomForm = (
         <div className="newroom-container">
           <h2>Create a new room</h2>
           <Form>
@@ -57,13 +58,29 @@ class Home extends Component {
             </Button>
           </Form>
         </div>
+      );
+    } else {
+      newRoomForm = (
+        <Message negative>
+          You do not have permissions to create new rooms yet. <br /> Please email us at{" "}
+          <a href="mailto:politichat@mit.edu?subject=Politichat Beta access request">
+            politichat@mit.edu
+          </a>{" "}
+          for information on how to gain access to our beta.
+        </Message>
+      );
+    }
+
+    const loggedInLanding = (
+      <>
+        {newRoomForm}
         <RoomList />
       </>
     );
 
     // Render the homePage if this.props.user exists (user is logged in),
     //   else render login page
-    return <div>{this.props.user ? loggedInLanding : loggedOutLanding}</div>;
+    return <>{this.props.user ? loggedInLanding : loggedOutLanding}</>;
   }
 }
 

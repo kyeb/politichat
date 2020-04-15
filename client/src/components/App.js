@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { Router, navigate } from "@reach/router";
+import { Router, Match, navigate } from "@reach/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCommentAlt } from "@fortawesome/free-solid-svg-icons";
+import { Divider, Button } from "semantic-ui-react";
 
 import "../utilities.css";
 import "../styles.css";
@@ -12,7 +13,6 @@ import Home from "./pages/Home.js";
 import AuthController from "./modules/AuthController";
 import RoomContainer from "./pages/RoomContainer";
 import ExitPage from "./pages/ExitPage";
-import { Divider } from "semantic-ui-react";
 import AdminPanel from "./pages/AdminPanel";
 
 /**
@@ -62,7 +62,26 @@ class App extends Component {
             <FontAwesomeIcon icon={faCommentAlt} className="header-icon" />
             Politichat
           </h1>
-          {this.state.user && <div className="header-buttons">{authController}</div>}
+          {this.state.user && (
+            <div className="header-buttons">
+              {this.state.user.admin && (
+                <Match path="/admin">
+                  {(props) =>
+                    props.match ? (
+                      <Button className="header-admin" onClick={() => navigate("/")}>
+                        Home
+                      </Button>
+                    ) : (
+                      <Button className="header-admin" onClick={() => navigate("/admin")}>
+                        Admin panel
+                      </Button>
+                    )
+                  }
+                </Match>
+              )}
+              {authController}
+            </div>
+          )}
         </header>
         <Divider />
         <Router>

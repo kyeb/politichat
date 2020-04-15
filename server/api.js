@@ -28,6 +28,13 @@ const needsAdmin = (req, res, next) => {
     next();
   }
 };
+const needsCanCreateRooms = (req, res, next) => {
+  if (!req.user || !req.user.canCreateRooms) {
+    res.status(403).send({ msg: "canCreateRooms permissions required" });
+  } else {
+    next();
+  }
+};
 
 function isValid(str) {
   var check = new RegExp(/[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/);
@@ -37,7 +44,7 @@ function isValid(str) {
   return true;
 }
 
-router.post("/newroom", (req, res) => {
+router.post("/newroom", [needsCanCreateRooms], (req, res) => {
   // error if room with same name already exists
   if (rooms.find((room) => room.roomName === req.body.roomName)) {
     res.status(400).send({ msg: "Room with that name already exists" });
@@ -75,7 +82,7 @@ router.post("/newroom", (req, res) => {
   res.send(room_temp);
 });
 
-router.post("/end", (req, res) => {
+router.post("/end", [needsCanCreateRooms], (req, res) => {
   const room = rooms.find((e) => e.id === req.body.id);
 
   // tell the old user that they should exit the page
@@ -175,7 +182,7 @@ router.post("/join", (req, res) => {
   res.send({ success: true });
 });
 
-router.post("/next", (req, res) => {
+router.post("/next", [needsCanCreateRooms], (req, res) => {
   const room = rooms.find((e) => e.id === req.body.id);
   // ensure logged in as owner
   if (req.user && room.owner !== req.user.username) {
@@ -216,7 +223,7 @@ router.post("/initsocket", (req, res) => {
   res.send({});
 });
 
-router.get("/users", (req, res) => {
+router.get("/users", [needsAdmin], (req, res) => {
   User.find({}).then((users) => {
     res.send(users);
   });

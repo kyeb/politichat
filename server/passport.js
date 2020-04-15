@@ -5,14 +5,16 @@ const User = require("./models/user");
 const bcrypt = require("bcrypt");
 
 function getLocalUser(username) {
-  return User.findOne({ username }).then((user) => {
-    if (user) return user.toJSON();
-    return undefined;
-  });
+  return User.findOne({ username })
+    .select("+password")
+    .then((user) => {
+      if (user) return user.toJSON();
+      return undefined;
+    });
 }
 
 passport.use(
-  new LocalStrategy({ usernameField: "username", passwordField: "password" }, async function(
+  new LocalStrategy({ usernameField: "username", passwordField: "password" }, async function (
     username,
     password,
     done
@@ -30,16 +32,14 @@ passport.use(
   })
 );
 
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function (user, done) {
   done(null, user.id);
 });
 
-passport.deserializeUser(function(id, done) {
-  User.findById(id)
-    .select("-password")
-    .then((user) => {
-      done(null, user.toJSON());
-    });
+passport.deserializeUser(function (id, done) {
+  User.findById(id).then((user) => {
+    done(null, user.toJSON());
+  });
 });
 
 module.exports = passport;

@@ -12,7 +12,11 @@ var schemaOptions = {
 const UserSchema = new mongoose.Schema(
   {
     username: String,
-    password: String,
+    password: {
+      type: String,
+      required: true,
+      select: false,
+    },
     admin: Boolean,
     canCreateRooms: Boolean,
   },
