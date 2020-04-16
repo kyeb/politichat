@@ -2,19 +2,24 @@ import React, { Component } from "react";
 import { Table, Message, Divider } from "semantic-ui-react";
 import { get } from "../../utilities";
 import UserRow from "../modules/UserRow.js";
+import RoomRow from "../modules/RoomRow";
 
 class AdminPanel extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // The this.state.users array is not kept in sync with changes visually on the page or on the server.
+      // These arrays are not kept in sync with changes visually on the page or on the server.
       users: [],
+      rooms: [],
     };
   }
 
   componentDidMount() {
     get("/api/users").then((users) => {
       this.setState({ users });
+    });
+    get("/api/rooms").then((rooms) => {
+      this.setState({ rooms });
     });
   }
 
@@ -28,6 +33,15 @@ class AdminPanel extends Component {
           <Table.Body>
             {this.state.users.map((user) => {
               return <UserRow key={user.id} user={user} self={this.props.user} />;
+            })}
+          </Table.Body>
+        </Table>
+        <Divider />
+        <h2>Open Rooms</h2>
+        <Table>
+          <Table.Body>
+            {this.state.rooms.map((room) => {
+              return <RoomRow key={room.id} room={room} />;
             })}
           </Table.Body>
         </Table>

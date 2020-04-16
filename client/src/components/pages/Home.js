@@ -53,7 +53,7 @@ class Home extends Component {
               onChange={(event) => this.setState({ newRoomName: event.target.value })}
               value={this.state.newRoomName}
             />
-            <Button className="newroom-button" onClick={this.handleNewRoom}>
+            <Button primary className="newroom-button" onClick={this.handleNewRoom}>
               Create room
             </Button>
           </Form>
