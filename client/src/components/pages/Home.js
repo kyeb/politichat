@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import AuthController from "../modules/AuthController";
 import RoomList from "../modules/RoomList";
-import { Button, Form, Input, Message } from "semantic-ui-react";
+import { Form, Message } from "semantic-ui-react";
 import { post } from "../../utilities";
 import { navigate } from "@reach/router";
 
@@ -11,13 +11,14 @@ class Home extends Component {
     super(props);
     this.state = {
       newRoomName: "",
+      newRoomPrivate: true
     };
   }
 
   componentDidMount() {}
 
   handleNewRoom = () => {
-    post("/api/newroom", { roomName: this.state.newRoomName })
+    post("/api/newroom", { roomName: this.state.newRoomName, isPrivate: this.state.newRoomPrivate })
       .then((room) => {
         navigate(`/room/${room.id}`);
       })
@@ -47,15 +48,21 @@ class Home extends Component {
         <div className="newroom-container">
           <h2>Create a new room</h2>
           <Form>
-            <Input
+            <Form.Input
               className="newroom-name"
               placeholder="Room name"
               onChange={(event) => this.setState({ newRoomName: event.target.value })}
               value={this.state.newRoomName}
+              width={5}
             />
-            <Button primary className="newroom-button" onClick={this.handleNewRoom}>
+            <Form.Checkbox
+              checked={this.state.newRoomPrivate}
+              label={<label>Private</label>}
+              onChange={(event) => this.setState((prevState) => ({ newRoomPrivate: !prevState.newRoomPrivate }))}
+            />
+            <Form.Button primary className="newroom-button" onClick={this.handleNewRoom}>
               Create room
-            </Button>
+            </Form.Button>
           </Form>
         </div>
       );

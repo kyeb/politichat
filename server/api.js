@@ -73,6 +73,7 @@ router.post("/newroom", [needsCanCreateRooms], (req, res) => {
     owner: req.user.username,
     current: null,
     queue: [],
+    isPrivate: req.body.isPrivate,
   };
 
   // add room object to array of rooms

@@ -27,7 +27,9 @@ class RoomList extends Component {
     const availableRooms = [];
 
     for (const [index, room] of this.state.rooms.entries()) {
-      availableRooms.push(<RoomListEntry room={room} key={index} />);
+      if (!room.isPrivate) {
+        availableRooms.push(<RoomListEntry room={room} key={index} />);
+      }
     }
 
     if (availableRooms.length === 0) {
