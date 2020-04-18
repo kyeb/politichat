@@ -10,6 +10,7 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      joinRoomId: "",
       newRoomName: "",
       newRoomPrivate: true
     };
@@ -27,6 +28,10 @@ class Home extends Component {
           "Something went wrong! Try a different name or reloading.\n\nTip: room names cannot contain special characters."
         );
       });
+  };
+
+  handleJoinRoom = () => {
+    navigate(`/room/${this.state.joinRoomId}`);
   };
 
   render() {
@@ -78,9 +83,28 @@ class Home extends Component {
       );
     }
 
+    let joinRoomForm = (
+      <div className="joinroom-container">
+        <h2>Join a room by ID</h2>
+        <Form>
+          <Form.Input
+            className="joinroom-id"
+            placeholder="Room ID"
+            onChange={(event) => this.setState({ joinRoomId: event.target.value })}
+            value={this.state.joinRoomId}
+            width={5}
+          />
+          <Form.Button primary className="joinroom-button" onClick={this.handleJoinRoom}>
+            Join room
+          </Form.Button>
+        </Form>
+      </div>
+    );
+
     const loggedInLanding = (
       <>
         {newRoomForm}
+        {joinRoomForm}
         <RoomList />
       </>
     );
