@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { navigate } from "@reach/router";
 import { Button, Loader } from "semantic-ui-react";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import VideoChat from "../modules/VideoChat";
 import { post, error } from "../../utilities";
@@ -11,6 +12,7 @@ class HostRoom extends Component {
     super(props);
     this.state = {
       queueLength: this.props.room ? this.props.room.queue.length : 0,
+      copied: false
     };
     socket.on("queue status", (queueLength) => {
       this.setState({ queueLength });
@@ -64,6 +66,9 @@ class HostRoom extends Component {
           <Button negative floated="right" onClick={this.handleEnd}>
             End session
           </Button>
+          <CopyToClipboard text={this.props.room.id} onCopy={() => this.setState({ copied: true })}>
+            <Button floated="right">{this.state.copied ? "Room link copied!" : "Copy room link"}</Button>
+          </CopyToClipboard>
         </div>
         <div>Number of participants in queue: {this.state.queueLength}</div>
       </div>
