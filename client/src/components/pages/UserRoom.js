@@ -67,6 +67,7 @@ class UserRoom extends Component {
           </Button>
           <p>Waiting in line to speak to {this.props.room.owner}...</p>
           {this.state.position && <p>You are position {this.state.position} in line.</p>}
+          <p>While you're waiting, check out <a href= {this.props.room.link} target= "_blank" > my website!</a></p>
         </>
       );
     }

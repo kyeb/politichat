@@ -44,6 +44,16 @@ function isValid(str) {
   return true;
 }
 
+function validURL(str) {
+  var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+    '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+    '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+    '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+  return !!pattern.test(str);
+}
+
 router.post("/newroom", [needsCanCreateRooms], (req, res) => {
   // error if room with same name already exists
   if (rooms.find((room) => room.roomName === req.body.roomName)) {
@@ -63,6 +73,12 @@ router.post("/newroom", [needsCanCreateRooms], (req, res) => {
     return;
   }
 
+  // error if link is not valid
+  if (validURL(req.body.roomLink) === false) {
+    res.status(400).send({ statusMessage: "URL not valid" });
+    return;
+  }
+
   // generate random room ID number
   const roomID = Math.random().toString(36).substr(2, 9);
 
@@ -73,6 +89,7 @@ router.post("/newroom", [needsCanCreateRooms], (req, res) => {
     owner: req.user.username,
     current: null,
     queue: [],
+    link: req.body.roomLink,
     isPrivate: req.body.isPrivate,
   };
 

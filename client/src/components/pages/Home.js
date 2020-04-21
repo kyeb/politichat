@@ -12,6 +12,7 @@ class Home extends Component {
     this.state = {
       joinRoomId: "",
       newRoomName: "",
+      newRoomLink: "",
       newRoomPrivate: true
     };
   }
@@ -19,7 +20,7 @@ class Home extends Component {
   componentDidMount() {}
 
   handleNewRoom = () => {
-    post("/api/newroom", { roomName: this.state.newRoomName, isPrivate: this.state.newRoomPrivate })
+    post("/api/newroom", { roomName: this.state.newRoomName, roomLink: this.state.newRoomLink, isPrivate: this.state.newRoomPrivate })
       .then((room) => {
         navigate(`/room/${room.id}`);
       })
@@ -58,6 +59,13 @@ class Home extends Component {
               placeholder="Room name"
               onChange={(event) => this.setState({ newRoomName: event.target.value })}
               value={this.state.newRoomName}
+              width={5}
+            />
+             <Form.Input
+              className="newroom-link"
+              placeholder="Room link"
+              onChange={(event) => this.setState({ newRoomLink: event.target.value })}
+              value={this.state.newRoomLink}
               width={5}
             />
             <Form.Checkbox

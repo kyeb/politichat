@@ -29,6 +29,10 @@ class ExitPage extends Component {
       return (
         <>
           <h3>Thank you for chatting with {this.state.room.owner}!</h3>
+          <p>
+            If you have further questions, please refer to 
+            <a href={this.state.room.link} target= "_blank" > my website! </a>
+          </p>
           <Button onClick={() => navigate("/")} content="Exit" />
         </>
       );
