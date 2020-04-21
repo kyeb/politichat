@@ -90,6 +90,8 @@ router.post("/newroom", [needsCanCreateRooms], (req, res) => {
     current: null,
     queue: [],
     link: req.body.roomLink,
+    waitMessage: req.body.waitingMessage,
+    exitMessage: req.body.exitMessage, 
     isPrivate: req.body.isPrivate,
   };
 

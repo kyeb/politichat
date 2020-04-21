@@ -1,9 +1,7 @@
 import React, { Component } from "react";
-
 import AuthController from "../modules/AuthController";
 import RoomList from "../modules/RoomList";
 import { Form, Message } from "semantic-ui-react";
-import { post } from "../../utilities";
 import { navigate } from "@reach/router";
 
 class Home extends Component {
@@ -11,25 +9,14 @@ class Home extends Component {
     super(props);
     this.state = {
       joinRoomId: "",
-      newRoomName: "",
-      newRoomLink: "",
-      newRoomPrivate: true
     };
   }
 
   componentDidMount() {}
 
-  handleNewRoom = () => {
-    post("/api/newroom", { roomName: this.state.newRoomName, roomLink: this.state.newRoomLink, isPrivate: this.state.newRoomPrivate })
-      .then((room) => {
-        navigate(`/room/${room.id}`);
-      })
-      .catch((err) => {
-        alert(
-          "Something went wrong! Try a different name or reloading.\n\nTip: room names cannot contain special characters."
-        );
-      });
-  };
+  handleCreateRoom = () => {
+    navigate(`/create`)
+  }
 
   handleJoinRoom = () => {
     navigate(`/room/${this.state.joinRoomId}`);
@@ -54,26 +41,7 @@ class Home extends Component {
         <div className="newroom-container">
           <h2>Create a new room</h2>
           <Form>
-            <Form.Input
-              className="newroom-name"
-              placeholder="Room name"
-              onChange={(event) => this.setState({ newRoomName: event.target.value })}
-              value={this.state.newRoomName}
-              width={5}
-            />
-             <Form.Input
-              className="newroom-link"
-              placeholder="Room link"
-              onChange={(event) => this.setState({ newRoomLink: event.target.value })}
-              value={this.state.newRoomLink}
-              width={5}
-            />
-            <Form.Checkbox
-              checked={this.state.newRoomPrivate}
-              label={<label>Private</label>}
-              onChange={(event) => this.setState((prevState) => ({ newRoomPrivate: !prevState.newRoomPrivate }))}
-            />
-            <Form.Button primary className="newroom-button" onClick={this.handleNewRoom}>
+            <Form.Button primary className="createroom-button" onClick={this.handleCreateRoom}>
               Create room
             </Form.Button>
           </Form>

@@ -10,6 +10,7 @@ import { socket } from "../client-socket.js";
 
 import NotFound from "./pages/NotFound.js";
 import Home from "./pages/Home.js";
+import CreateRoom from "./pages/CreateRoom.js"
 import AuthController from "./modules/AuthController";
 import RoomContainer from "./pages/RoomContainer";
 import ExitPage from "./pages/ExitPage";
@@ -86,6 +87,7 @@ class App extends Component {
         <Divider />
         <Router>
           <Home path="/" setUser={this.setUser} logout={this.handleLogout} user={this.state.user} />
+          <CreateRoom path="/create" user={this.state.user}/>
           <AdminPanel path="/admin" user={this.state.user} />
           <RoomContainer
             path="/room/:roomId"

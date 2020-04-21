@@ -33,6 +33,7 @@ class ExitPage extends Component {
             If you have further questions, please refer to 
             <a href={this.state.room.link} target= "_blank" > my website! </a>
           </p>
+          <p> {this.state.room.exitMessage} </p>
           <Button onClick={() => navigate("/")} content="Exit" />
         </>
       );
