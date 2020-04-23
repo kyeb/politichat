@@ -19,7 +19,15 @@ class Home extends Component {
   };
 
   handleJoinRoom = () => {
-    navigate(`/room/${this.state.joinRoomId}`);
+    let stripId = (roomId) => {
+        // allow pasting link; strip after last '/'
+        let split = roomId.split("/");
+        return split[split.length - 1];
+    };
+
+    let roomId = stripId(this.state.joinRoomId);
+
+    navigate(`/room/${roomId}`);
   };
 
   render() {

@@ -66,9 +66,9 @@ class HostRoom extends Component {
           <Button negative floated="right" onClick={this.handleEnd}>
             End session
           </Button>
-          <CopyToClipboard text={this.props.room.id} onCopy={() => this.setState({ copied: true })}>
+          <CopyToClipboard text={window.location.href} onCopy={() => this.setState({ copied: true })}>
             <Button floated="right">
-              {this.state.copied ? "Room ID copied!" : "Copy room ID"}
+              {this.state.copied ? "Room link copied!" : "Copy room link"}
             </Button>
           </CopyToClipboard>
         </div>
