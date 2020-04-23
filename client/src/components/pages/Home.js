@@ -31,6 +31,29 @@ class Home extends Component {
   };
 
   render() {
+    let joinRoomForm = (
+      <div className="joinroom-container">
+        <h2>Join a room by ID</h2>
+        <Form>
+          <Form.Input
+            className="joinroom-id"
+            placeholder="Room ID"
+            onChange={(event) => this.setState({ joinRoomId: event.target.value })}
+            value={this.state.joinRoomId}
+            width={5}
+          />
+          <Form.Button
+            primary
+            className="joinroom-button"
+            onClick={this.handleJoinRoom}
+            disabled={this.state.joinRoomId === ""}
+          >
+            Join room
+          </Form.Button>
+        </Form>
+      </div>
+    );
+
     const loggedOutLanding = (
       <>
         <AuthController
@@ -39,6 +62,7 @@ class Home extends Component {
           setUser={this.props.setUser}
           providers={["google"]}
         />
+        {joinRoomForm}
         <RoomList />
       </>
     );
@@ -66,29 +90,6 @@ class Home extends Component {
         </Message>
       );
     }
-
-    let joinRoomForm = (
-      <div className="joinroom-container">
-        <h2>Join a room by ID</h2>
-        <Form>
-          <Form.Input
-            className="joinroom-id"
-            placeholder="Room ID"
-            onChange={(event) => this.setState({ joinRoomId: event.target.value })}
-            value={this.state.joinRoomId}
-            width={5}
-          />
-          <Form.Button
-            primary
-            className="joinroom-button"
-            onClick={this.handleJoinRoom}
-            disabled={this.state.joinRoomId === ""}
-          >
-            Join room
-          </Form.Button>
-        </Form>
-      </div>
-    );
 
     const loggedInLanding = (
       <>
