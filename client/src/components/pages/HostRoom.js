@@ -76,6 +76,15 @@ class HostRoom extends Component {
       </div>
     );
 
+    if (this.state.copied) {
+      // remove the "Room link copied!" after two seconds
+      setTimeout(() => {
+        this.setState({
+          copied: false
+        });
+      }, 2000);
+    }
+
     return (
       <>
         {controller}
