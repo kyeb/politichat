@@ -17,6 +17,7 @@ const UserSchema = new mongoose.Schema(
       required: true,
       select: false,
     },
+    displayName: String,
     admin: Boolean,
     canCreateRooms: Boolean,
   },

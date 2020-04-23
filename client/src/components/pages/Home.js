@@ -15,8 +15,8 @@ class Home extends Component {
   componentDidMount() {}
 
   handleCreateRoom = () => {
-    navigate(`/create`)
-  }
+    navigate(`/create`);
+  };
 
   handleJoinRoom = () => {
     navigate(`/room/${this.state.joinRoomId}`);
@@ -70,7 +70,12 @@ class Home extends Component {
             value={this.state.joinRoomId}
             width={5}
           />
-          <Form.Button primary className="joinroom-button" onClick={this.handleJoinRoom}>
+          <Form.Button
+            primary
+            className="joinroom-button"
+            onClick={this.handleJoinRoom}
+            disabled={this.state.joinRoomId === ""}
+          >
             Join room
           </Form.Button>
         </Form>

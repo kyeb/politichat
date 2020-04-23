@@ -9,6 +9,7 @@ class LocalAuth extends Component {
       username: "",
       password: "",
       passwordConfirm: "",
+      displayName: "",
       isRegistering: false,
       errorMessage: "",
     };
@@ -38,13 +39,13 @@ class LocalAuth extends Component {
   };
 
   attemptRegister = () => {
-    const { username, password, passwordConfirm } = this.state;
+    const { username, password, passwordConfirm, displayName } = this.state;
     if (password != passwordConfirm) {
       this.setState({ errorMessage: "Passwords don't match" });
     } else if (username === "" || password === "") {
       this.setState({ errorMessage: "Cannot have an empty username or password!" });
     } else {
-      post("/auth/register", { username, password })
+      post("/auth/register", { username, password, displayName })
         .then((user) => {
           this.props.login(user);
         })
@@ -84,6 +85,12 @@ class LocalAuth extends Component {
               type="password"
               name="passwordConfirm"
               placeholder="Confirm password"
+            />
+            <Input
+              className="login-input"
+              onChange={this.handleChange}
+              name="displayName"
+              placeholder="Display name"
             />
             <div className="auth-buttons">
               <Button content="Register" onClick={this.attemptRegister} />

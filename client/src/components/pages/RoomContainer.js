@@ -37,7 +37,7 @@ class RoomContainer extends Component {
 
     let room;
     if (this.props.user && this.state.room && this.props.user.username === this.state.room.owner) {
-      room = <HostRoom room={this.state.room} />;
+      room = <HostRoom room={this.state.room} user={this.props.user} />;
     } else if (this.state.room && this.props.socketConnected) {
       room = <UserRoom room={this.state.room} />;
     } else {

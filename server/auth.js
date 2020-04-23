@@ -15,7 +15,6 @@ const { decorateRouter } = require("@awaitjs/express");
 // api endpoints: all these paths will be prefixed with "/api/"
 const router = decorateRouter(express.Router());
 
-const socket = require("./server-socket");
 const SALT_ROUNDS = 10;
 const bcrypt = require("bcrypt");
 const User = require("./models/user");
@@ -27,7 +26,7 @@ router.get("/logout", (req, res) => {
   res.send({});
 });
 
-async function createUser(username, password) {
+async function createUser(username, password, displayName) {
   // Throws if user exists
   if (await User.findOne({ username })) {
     throw Error(ALREADY_REGISTERED_ERROR);
@@ -36,14 +35,15 @@ async function createUser(username, password) {
   const newUser = new User({
     username: username,
     password: hashedSaltedPwd,
+    displayName: displayName,
   });
   return newUser.save();
 }
 
 router.postAsync("/register", async (req, res) => {
   try {
-    const user = await createUser(req.body.username, req.body.password);
-    req.login(user, function(err) {
+    const user = await createUser(req.body.username, req.body.password, req.body.displayName);
+    req.login(user, function (err) {
       logger.info(`Local Auth: Registed user ID ${req.user.id}`);
       req.user.password = undefined;
       res.send(req.user);
@@ -57,7 +57,7 @@ router.postAsync("/register", async (req, res) => {
   }
 });
 
-router.post("/login", passport.authenticate("local"), function(req, res) {
+router.post("/login", passport.authenticate("local"), function (req, res) {
   logger.info(`Local Auth: Logged in user ID ${req.user.id}`);
   res.send(req.user);
 });

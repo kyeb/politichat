@@ -12,7 +12,7 @@ class HostRoom extends Component {
     super(props);
     this.state = {
       queueLength: this.props.room ? this.props.room.queue.length : 0,
-      copied: false
+      copied: false,
     };
     socket.on("queue status", (queueLength) => {
       this.setState({ queueLength });
@@ -53,7 +53,7 @@ class HostRoom extends Component {
     // Set up a video chat if we got a room back from API, otherwise show loader
     let jitsi;
     if (this.props.room && this.props.room.id) {
-      jitsi = <VideoChat room={this.props.room} />;
+      jitsi = <VideoChat room={this.props.room} user={this.props.user} />;
     } else {
       jitsi = <Loader active />;
     }
@@ -67,7 +67,9 @@ class HostRoom extends Component {
             End session
           </Button>
           <CopyToClipboard text={this.props.room.id} onCopy={() => this.setState({ copied: true })}>
-            <Button floated="right">{this.state.copied ? "Room ID copied!" : "Copy room ID"}</Button>
+            <Button floated="right">
+              {this.state.copied ? "Room ID copied!" : "Copy room ID"}
+            </Button>
           </CopyToClipboard>
         </div>
         <div>Number of participants in queue: {this.state.queueLength}</div>

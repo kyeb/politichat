@@ -33,6 +33,9 @@ class VideoChat extends Component {
         ],
         VIDEO_QUALITY_LABEL_DISABLED: true,
       },
+      userInfo: {
+        displayName: this.props.user ? this.props.user.displayName : "Participant",
+      },
     };
 
     const api = new JitsiMeetExternalAPI(jitsiDomain, jitsiOptions);
