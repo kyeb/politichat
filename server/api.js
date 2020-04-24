@@ -101,6 +101,12 @@ router.post("/newroom", [needsCanCreateRooms], (req, res) => {
   // add room object to array of rooms
   rooms.push(room_temp);
 
+  // update roomlist on user frontends
+  const allConnected = socket.getAllConnectedSockets();
+  allConnected.forEach((connectedSocket) => {
+    connectedSocket.emit("new room", room_temp);
+  });
+
   // then, send back the entire room object
   res.send(room_temp);
 });
@@ -134,6 +140,13 @@ router.post("/end", [needsCanCreateRooms], (req, res) => {
   if (rooms.length == length) {
     res.send({ success: false });
   }
+
+  // update roomlist on user frontends
+  const allConnected = socket.getAllConnectedSockets();
+  allConnected.forEach((connectedSocket) => {
+    connectedSocket.emit("room ended", room);
+  });
+
   res.send({ success: true });
 });
 

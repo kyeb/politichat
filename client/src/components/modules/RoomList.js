@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Loader, Table, Message } from "semantic-ui-react";
 import { get } from "../../utilities";
 import RoomListEntry from "./RoomListEntry";
+import { socket } from "../../client-socket";
 
 class RoomList extends Component {
   constructor(props) {
@@ -11,6 +12,12 @@ class RoomList extends Component {
       loading: true,
       rooms: [],
     };
+    socket.on("new room", (newRoom) => {
+      this.setState({ rooms: this.state.rooms.concat(newRoom) });
+    });
+    socket.on("room ended", (oldRoom) => {
+      this.setState({ rooms: this.state.rooms.filter((e) => e.id !== oldRoom.id) });
+    });
   }
 
   componentDidMount() {

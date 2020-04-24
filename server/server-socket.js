@@ -5,11 +5,18 @@ let io;
 
 const userToSocketMap = {}; // maps user ID to socket object
 const socketToUserMap = {}; // maps socket ID to user object
+const allConnectedSocketIDs = new Set();
 
 const getAllConnectedUsers = () => Object.values(socketToUserMap);
 const getSocketFromUsername = (username) => userToSocketMap[username];
 const getUserFromSocketID = (socketid) => socketToUserMap[socketid];
 const getSocketFromSocketID = (socketid) => io.sockets.connected[socketid];
+
+const getAllConnectedSockets = () => {
+  const sockets = new Set();
+  allConnectedSocketIDs.forEach((s) => sockets.add(getSocketFromSocketID(s)));
+  return sockets;
+};
 
 const addUser = (user, socket) => {
   const oldSocket = userToSocketMap[user.username];
@@ -48,6 +55,7 @@ module.exports = {
       next();
     });
     io.on("connection", async (socket) => {
+      allConnectedSocketIDs.add(socket.id);
       if (socket.userId) {
         const userObj = await User.findById(socket.userId).select("-password");
         socket.emit("user", userObj.toJSON());
@@ -55,6 +63,7 @@ module.exports = {
       socket.on("disconnect", (reason) => {
         const user = getUserFromSocketID(socket.id);
         removeUser(user, socket);
+        allConnectedSocketIDs.delete(socket.id);
       });
     });
   },
@@ -66,6 +75,7 @@ module.exports = {
   getUserFromSocketID: getUserFromSocketID,
   getSocketFromSocketID: getSocketFromSocketID,
   getAllConnectedUsers: getAllConnectedUsers,
+  getAllConnectedSockets: getAllConnectedSockets,
 
   getIo: () => io,
 };
