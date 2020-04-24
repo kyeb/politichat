@@ -33,6 +33,10 @@ header {
   padding: 5px 0;
 }
 
+.joinroom-id {
+  width: 30vw;
+}
+
 footer {
   position: absolute;
   bottom: 10px;

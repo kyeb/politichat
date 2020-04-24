@@ -1,18 +1,26 @@
 import React, { Component } from "react";
 import AuthController from "../modules/AuthController";
 import RoomList from "../modules/RoomList";
-import { Form, Message } from "semantic-ui-react";
+import { Form, Input, Label, Message } from "semantic-ui-react";
+import { get } from "../../utilities";
 import { navigate } from "@reach/router";
 
 class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      joinRoomError: "",
       joinRoomId: "",
+      roomIds: -1 // placeholder indicating hasn't loaded
     };
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    get("/api/rooms").then((rooms) => {
+      let ids = rooms.map((room) => room.id);
+      this.setState({ roomIds: ids });
+    });
+  }
 
   handleCreateRoom = () => {
     navigate(`/create`);
@@ -20,28 +28,42 @@ class Home extends Component {
 
   handleJoinRoom = () => {
     let stripId = (roomId) => {
-        // allow pasting link; strip after last '/'
-        let split = roomId.split("/");
-        return split[split.length - 1];
+      // allow pasting link; strip after last '/'
+      let split = roomId.split("/");
+      return split[split.length - 1];
     };
 
     let roomId = stripId(this.state.joinRoomId);
 
-    navigate(`/room/${roomId}`);
+    if (this.state.roomIds !== -1 && !this.state.roomIds.includes(roomId)) {
+      this.setState({ joinRoomError: "No room found with given ID" });
+    } else {
+      navigate(`/room/${roomId}`);
+    }
   };
 
   render() {
+    let joinRoomErrorLabel = <div />;
+    if (this.state.joinRoomError) {
+      joinRoomErrorLabel = (
+        <Label pointing prompt>
+          {this.state.joinRoomError}
+        </Label>
+      );
+    }
+
     let joinRoomForm = (
       <div className="joinroom-container">
         <h2>Join a room by ID</h2>
         <Form>
-          <Form.Input
-            className="joinroom-id"
-            placeholder="Room ID"
-            onChange={(event) => this.setState({ joinRoomId: event.target.value })}
-            value={this.state.joinRoomId}
-            width={5}
-          />
+          <Form.Field className="joinroom-id">
+            <Input
+              placeholder="Room ID"
+              onChange={(event) => this.setState({ joinRoomId: event.target.value })}
+              value={this.state.joinRoomId}
+            />
+            {joinRoomErrorLabel}
+          </Form.Field>
           <Form.Button
             primary
             className="joinroom-button"
