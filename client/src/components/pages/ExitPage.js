@@ -39,6 +39,9 @@ class ExitPage extends Component {
       );
     }
     if (this.props.reason === "host") {
+      if (!this.state.room) {
+        return <Loader active />;
+      }
       return (
         <>
           <h3>
@@ -49,6 +52,10 @@ class ExitPage extends Component {
             Please send any questions or feedback to
             <a href="mailto:politichat@mit.edu"> politichat@mit.edu</a>
           </p>
+          <p>
+            Here is the list of emails of participants:
+          </p>
+          {this.state.room.emailList.map((email) => (<p>- {email}</p>))}
           <Button onClick={() => navigate("/")} content="Exit" />
         </>
       );

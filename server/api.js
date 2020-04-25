@@ -195,6 +195,11 @@ router.post("/join", (req, res) => {
   // adds a user's socketID to the queue for the given room
   const userSocket = socket.getSocketFromSocketID(req.body.socketID);
   const room = rooms.find((e) => e.id === req.body.roomID);
+  if (!room) {
+    res.status(404).send({});
+    return;
+  }
+
   // if the host is trying to join, don't let them
   if (userSocket === socket.getSocketFromUsername(room.owner)) {
     updateHost(room);
@@ -216,6 +221,20 @@ router.post("/join", (req, res) => {
   updateUsers(room);
 
   res.send({ success: true });
+});
+
+router.post("/submitEmail", (req, res) => {
+  // add an email address to the room's email list
+  const room = rooms.find((e) => e.id === req.body.roomID);
+  if (!room) {
+    res.status(404).send({});
+    return;
+  }
+
+  if (!room.emailList) {
+    room.emailList = [];
+  }
+  room.emailList.push(req.body.email);
 });
 
 router.post("/next", [needsCanCreateRooms], (req, res) => {

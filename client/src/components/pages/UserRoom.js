@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { navigate } from "@reach/router";
-import { Button, Loader, Input } from "semantic-ui-react";
+import { Button, Divider, Form, Loader, Input } from "semantic-ui-react";
 
 import VideoChat from "../modules/VideoChat";
 import { post, error } from "../../utilities";
@@ -10,6 +10,8 @@ class UserRoom extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      emailAddress: "",
+      emailSubmitted: false,
       ready: false,
       position: null,
       displayName: "",
@@ -46,7 +48,14 @@ class UserRoom extends Component {
     post("/api/join", { roomID: this.props.room.id, socketID: socket.id })
       .then(() => {})
       .catch((err) => error(err, "Joining room failed"));
-  };
+  }
+
+  handleSubmitEmail() {
+    this.setState({ emailSubmitted: true });
+    post("/api/submitEmail", { roomID: this.props.room.id, email: this.state.emailAddress })
+      .then(() => {})
+      .catch((err) => error(err, "Submitting email failed"));
+  }
 
   componentDidMount() {
     if (socket.id) {
@@ -84,6 +93,25 @@ class UserRoom extends Component {
             onChange={(event) => this.setState({ displayName: event.target.value })}
             value={this.state.displayName}
           />
+          <Divider />
+          <p>Enter your email address to stay updated!</p>
+          <Form>
+            <Form.Input
+              className="userroom-emailaddr"
+              placeholder="Email address"
+              onChange={(event) => this.setState({ emailAddress: event.target.value })}
+              value={this.state.emailAddress}
+              disabled={this.state.emailSubmitted}
+            />
+            <Form.Button
+              primary
+              className="userroom-emailbutton"
+              onClick={this.handleSubmitEmail.bind(this)}
+              disabled={!this.state.emailAddress || this.state.emailSubmitted}
+            >
+              {this.state.emailSubmitted ? "Submitted!" : "Submit"}
+            </Form.Button>
+          </Form>
         </>
       );
     }

@@ -39,7 +39,7 @@ class HostRoom extends Component {
     post("/api/end", { id: this.props.room.id })
       .then((res) => {
         if (res.success) {
-          navigate("/exit/host/null");
+          navigate(`/exit/host/${this.props.room.id}`);
         } else {
           error(res, "did not delete from array");
         }
