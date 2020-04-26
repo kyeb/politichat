@@ -234,7 +234,14 @@ router.post("/submitEmail", (req, res) => {
   if (!room.emailList) {
     room.emailList = [];
   }
-  room.emailList.push(req.body.email);
+
+  // ensure is valid email
+  let pattern = /\S+@\S+\.\S+/;
+  if (pattern.test(req.body.email)) {
+    room.emailList.push(req.body.email);
+  } else {
+    res.status(400).send({});
+  }
 });
 
 router.post("/next", [needsCanCreateRooms], (req, res) => {

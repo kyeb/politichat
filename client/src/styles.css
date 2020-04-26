@@ -37,6 +37,10 @@ header {
   width: 30vw;
 }
 
+.userroom-email {
+  width: 30vw;
+}
+
 footer {
   position: absolute;
   bottom: 10px;

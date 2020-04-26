@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { navigate } from "@reach/router";
-import { Button, Divider, Form, Loader, Input } from "semantic-ui-react";
+import { Button, Divider, Form, Input, Label, Loader } from "semantic-ui-react";
 
 import VideoChat from "../modules/VideoChat";
 import { post, error } from "../../utilities";
@@ -11,6 +11,7 @@ class UserRoom extends Component {
     super(props);
     this.state = {
       emailAddress: "",
+      emailError: "",
       emailSubmitted: false,
       ready: false,
       position: null,
@@ -51,10 +52,19 @@ class UserRoom extends Component {
   }
 
   handleSubmitEmail() {
-    this.setState({ emailSubmitted: true });
-    post("/api/submitEmail", { roomID: this.props.room.id, email: this.state.emailAddress })
-      .then(() => {})
-      .catch((err) => error(err, "Submitting email failed"));
+    let pattern = /\S+@\S+\.\S+/;
+    if (pattern.test(this.state.emailAddress)) {
+      this.setState({
+        emailSubmitted: true,
+        emailError: ""
+      });
+
+      post("/api/submitEmail", { roomID: this.props.room.id, email: this.state.emailAddress })
+        .then(() => {})
+        .catch((err) => error(err, "Submitting email failed"));
+    } else {
+      this.setState({ emailError: "Enter a valid email address" });
+    }
   }
 
   componentDidMount() {
@@ -65,6 +75,15 @@ class UserRoom extends Component {
 
   render() {
     if (!this.state.ready) {
+        let emailErrorLabel = <div />;
+        if (this.state.emailError) {
+          emailErrorLabel = (
+            <Label pointing prompt>
+              {this.state.emailError}
+            </Label>
+          );
+        }
+
       return (
         <>
           <Button
@@ -96,13 +115,16 @@ class UserRoom extends Component {
           <Divider />
           <p>Enter your email address to stay updated!</p>
           <Form>
-            <Form.Input
-              className="userroom-emailaddr"
-              placeholder="Email address"
-              onChange={(event) => this.setState({ emailAddress: event.target.value })}
-              value={this.state.emailAddress}
-              disabled={this.state.emailSubmitted}
-            />
+            <Form.Field className="userroom-email">
+              <Input
+                className="userroom-emailaddr"
+                placeholder="Email address"
+                onChange={(event) => this.setState({ emailAddress: event.target.value })}
+                value={this.state.emailAddress}
+                disabled={this.state.emailSubmitted}
+              />
+              {emailErrorLabel}
+            </Form.Field>
             <Form.Button
               primary
               className="userroom-emailbutton"
