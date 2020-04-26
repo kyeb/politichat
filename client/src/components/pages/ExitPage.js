@@ -13,7 +13,7 @@ class ExitPage extends Component {
 
   componentDidMount() {
     if (this.props.roomId !== "null") {
-      get("/api/room", { id: this.props.roomId })
+      get("/api/endedroom", { id: this.props.roomId })
         .then((room) => {
           this.setState({ room });
         })

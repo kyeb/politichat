@@ -16,6 +16,7 @@ const User = require("./models/user");
 
 // array to store rooms
 let rooms = [];
+let endedRooms = [];
 
 // api endpoints: all these paths will be prefixed with "/api/"
 const router = express.Router();
@@ -130,6 +131,9 @@ router.post("/end", [needsCanCreateRooms], (req, res) => {
     }
   }
 
+  // add the room to ended rooms for exit pages
+  endedRooms.push(room);
+
   // delete a room by its ID from the array of active rooms
   const length = rooms.length;
   rooms = rooms.filter(function (e) {
@@ -159,6 +163,15 @@ router.get("/room", (req, res) => {
   // returns just the room with a specific requested ID
   // each room should have the id and roomName so far
   res.send(rooms.find((e) => e.id === req.query.id));
+});
+
+router.get("/endedroom", (req, res) => {
+  // returns possibly ended room with a specific requested ID
+  const room = rooms.find((e) => e.id === req.query.id);
+  if (!room) {
+    res.send(endedRooms.find((e) => e.id === req.query.id));
+  }
+  res.send(room);
 });
 
 router.post("/leavequeue", (req, res) => {
