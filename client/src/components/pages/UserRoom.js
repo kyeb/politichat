@@ -29,7 +29,11 @@ class UserRoom extends Component {
       this.exitLine();
     });
     socket.on("room gone", () => {
-      this.roomGone();
+      if (this.state.ready) {
+        this.exitLine();
+      } else {
+        this.roomGone();
+      }
     });
     socket.on("position update", (position) => {
       this.setState({ position });
