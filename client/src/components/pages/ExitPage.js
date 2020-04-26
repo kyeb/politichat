@@ -42,6 +42,24 @@ class ExitPage extends Component {
       if (!this.state.room) {
         return <Loader active />;
       }
+
+      let emails = <div />;
+      if (this.state.room.emailList) {
+        emails = (
+          <div>
+            <p>
+              Here is the list of emails of participants:
+            </p>
+            {this.state.room.emailList.map((email, index) => (
+              <p key={index}>
+                {index + 1}. {email}
+              </p>
+            ))}
+            <span />
+          </div>
+        );
+      }
+
       return (
         <>
           <h3>
@@ -52,10 +70,7 @@ class ExitPage extends Component {
             Please send any questions or feedback to
             <a href="mailto:politichat@mit.edu"> politichat@mit.edu</a>
           </p>
-          <p>
-            Here is the list of emails of participants:
-          </p>
-          {this.state.room.emailList.map((email) => (<p>- {email}</p>))}
+          {emails}
           <Button onClick={() => navigate("/")} content="Exit" />
         </>
       );
