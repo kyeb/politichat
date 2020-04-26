@@ -79,14 +79,25 @@ class UserRoom extends Component {
 
   render() {
     if (!this.state.ready) {
-        let emailErrorLabel = <div />;
-        if (this.state.emailError) {
-          emailErrorLabel = (
-            <Label pointing prompt>
-              {this.state.emailError}
-            </Label>
-          );
-        }
+      let emailErrorLabel = <div />;
+      if (this.state.emailError) {
+        emailErrorLabel = (
+          <Label pointing prompt>
+            {this.state.emailError}
+          </Label>
+        );
+      }
+
+      let websiteLink = <div />;
+      if (this.props.room.link) {
+        websiteLink = <p>
+          While you're waiting, check out{" "}
+          <a href={this.props.room.link} target="_blank">
+            {" "}
+            my website!
+          </a>
+        </p>;
+      }
 
       return (
         <>
@@ -100,13 +111,7 @@ class UserRoom extends Component {
           </Button>
           <p>Waiting in line to speak to {this.props.room.owner}...</p>
           {this.state.position && <p>You are position {this.state.position} in line.</p>}
-          <p>
-            While you're waiting, check out{" "}
-            <a href={this.props.room.link} target="_blank">
-              {" "}
-              my website!
-            </a>
-          </p>
+          {websiteLink}
           <p> {this.props.room.waitMessage} </p>
           <br />
           <p>Set a name to appear as in the video chat:</p>

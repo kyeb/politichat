@@ -78,7 +78,7 @@ router.post("/newroom", [needsCanCreateRooms], (req, res) => {
   }
 
   // error if link is not valid
-  if (validURL(req.body.roomLink) === false) {
+  if (req.body.roomLink && validURL(req.body.roomLink) === false) {
     res.status(400).send({ statusMessage: "URL not valid" });
     return;
   }
