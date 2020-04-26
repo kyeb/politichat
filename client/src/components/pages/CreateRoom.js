@@ -45,7 +45,7 @@ class CreateRoom extends Component {
                     />
                     <Form.Input
                     className="newroom-link"
-                    placeholder="Room link"
+                    placeholder="Link to your website!"
                     onChange={(event) => this.setState({ newRoomLink: event.target.value })}
                     value={this.state.newRoomLink}
                     width={5}
