@@ -176,6 +176,7 @@ router.get("/endedroom", (req, res) => {
 
 router.post("/leavequeue", (req, res) => {
   removeFromQueue(req.body.roomID, req.body.socketID);
+  res.send({ success: true });
 });
 
 function removeFromQueue(roomID, userSocketID) {
@@ -252,6 +253,7 @@ router.post("/submitEmail", (req, res) => {
   let pattern = /\S+@\S+\.\S+/;
   if (pattern.test(req.body.email)) {
     room.emailList.push(req.body.email);
+    res.send({ success: true });
   } else {
     res.status(400).send({});
   }
