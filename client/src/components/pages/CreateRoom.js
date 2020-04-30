@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Form, Message } from "semantic-ui-react";
+import { DateTimeInput } from "semantic-ui-calendar-react";
 import { post } from "../../utilities";
 import { navigate } from "@reach/router";
 
@@ -11,7 +12,9 @@ class CreateRoom extends Component {
       newRoomLink: "",
       newRoomWaiting: "",
       newRoomExit: "",
-      newRoomPrivate: true
+      newRoomPrivate: true,
+      newRoomScheduled: false,
+      newRoomDatetime: ""
     };
   }
 
@@ -23,7 +26,9 @@ class CreateRoom extends Component {
       roomLink: this.state.newRoomLink,
       waitingMessage: this.state.newRoomWaiting,
       exitMessage: this.state.newRoomExit,
-      isPrivate: this.state.newRoomPrivate
+      isPrivate: this.state.newRoomPrivate,
+      isScheduled: this.state.newRoomScheduled,
+      datetime: this.state.newRoomDatetime
     }).then((room) => {
       navigate(`/room/${room.id}`);
     }).catch((err) => {
@@ -80,6 +85,29 @@ class CreateRoom extends Component {
       />
     );
 
+    let roomScheduledCheckbox = (
+      <Form.Checkbox
+        checked={this.state.newRoomScheduled}
+        label={<label>Schedule for later</label>}
+        onChange={(event) => this.setState((prevState) => ({ newRoomScheduled: !prevState.newRoomScheduled }))}
+      />
+    );
+
+    let datetimePicker = <div/>;
+    if (this.state.newRoomScheduled) {
+      datetimePicker = (
+        <DateTimeInput
+          closable
+          dateTimeFormat="MM-DD-YYYY hh:mm A"
+          iconPosition="left"
+          onChange={(event, {name, value}) => this.setState({ newRoomDatetime: value })}
+          placeholder="Scheduled time"
+          preserveViewMode={false}
+          value={this.state.newRoomDatetime}
+        />
+      );
+    }
+
     let submitButton = (
       <Form.Button primary className="newroom-button" onClick={this.handleNewRoom}>
         Create room
@@ -95,6 +123,8 @@ class CreateRoom extends Component {
           {waitingMessageTextarea}
           {exitMessageTextarea}
           {roomPrivateCheckbox}
+          {roomScheduledCheckbox}
+          {datetimePicker}
           {submitButton}
         </Form>
       </div>

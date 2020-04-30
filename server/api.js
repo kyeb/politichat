@@ -97,6 +97,8 @@ router.post("/newroom", [needsCanCreateRooms], (req, res) => {
     waitMessage: req.body.waitingMessage,
     exitMessage: req.body.exitMessage,
     isPrivate: req.body.isPrivate,
+    isScheduled: req.body.isScheduled,
+    datetime: Date.parse(req.body.datetime)
   };
 
   // add room object to array of rooms
