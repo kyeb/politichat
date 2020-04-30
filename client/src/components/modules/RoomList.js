@@ -32,28 +32,58 @@ class RoomList extends Component {
     }
 
     const availableRooms = [];
+    const futureRooms = [];
 
     for (const [index, room] of this.state.rooms.entries()) {
       if (!room.isPrivate) {
-        availableRooms.push(<RoomListEntry room={room} key={index} />);
+        let isFuture = false;
+        if (room.isScheduled) {
+          if (room.datetime > new Date().getTime()) {
+            isFuture = true;
+          }
+        }
+
+        if (isFuture) {
+          futureRooms.push(<RoomListEntry room={room} key={index} />);
+        } else {
+          availableRooms.push(<RoomListEntry room={room} key={index} />);
+        }
       }
     }
 
-    if (availableRooms.length === 0) {
-      return (
-        <Message>
-          Sorry, there are no available public rooms right now. Check back again later, or create
-          one yourself!
-        </Message>
+    let currentRooms = (
+      <Message>
+        Sorry, there are no available public rooms right now. Check back again later, or create
+        one yourself!
+      </Message>
+    );
+    if (availableRooms.length > 0) {
+      currentRooms = (
+        <>
+          <h2>Open rooms</h2>
+          <Table celled>
+            <Table.Body>{availableRooms}</Table.Body>
+          </Table>
+        </>
+      );
+    }
+
+    let upcomingRooms = <div/>;
+    if (futureRooms.length > 0) {
+      upcomingRooms = (
+        <>
+          <h2>Upcoming rooms</h2>
+          <Table celled>
+            <Table.Body>{futureRooms}</Table.Body>
+          </Table>
+        </>
       );
     }
 
     return (
       <>
-        <h2>Open rooms</h2>
-        <Table celled>
-          <Table.Body>{availableRooms}</Table.Body>
-        </Table>
+        {currentRooms}
+        {upcomingRooms}
       </>
     );
   }
