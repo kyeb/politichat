@@ -18,8 +18,6 @@ class CreateRoom extends Component {
     };
   }
 
-  componentDidMount() {}
-
   handleNewRoom = () => {
     post("/api/newroom", {
       roomName: this.state.newRoomName,
@@ -98,6 +96,7 @@ class CreateRoom extends Component {
       datetimePicker = (
         <DateTimeInput
           closable
+          closeOnMouseLeave={false}
           dateTimeFormat="MM-DD-YYYY hh:mm A"
           iconPosition="left"
           onChange={(event, {name, value}) => this.setState({ newRoomDatetime: value })}

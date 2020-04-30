@@ -26,6 +26,25 @@ class RoomList extends Component {
     });
   }
 
+  compareEntries(a, b) {
+    a = a.props.room;
+    b = b.props.room;
+    let aisfuture = a.isScheduled && a.datetime > new Date().getTime();
+    let bisfuture = b.isScheduled && b.datetime > new Date().getTime();
+    if (aisfuture !== bisfuture) {
+      // future ones last
+      return aisfuture - bisfuture;
+    }
+
+    if (aisfuture) {
+      // later starts last
+      return a.datetime - b.datetime;
+    }
+
+    // stable
+    return -1;
+  }
+
   render() {
     if (this.state.loading) {
       return <Loader active />;
@@ -65,6 +84,11 @@ class RoomList extends Component {
         }
       }
     }
+
+    // sort rooms
+    myRooms.sort(this.compareEntries);
+    futureRooms.sort(this.compareEntries);
+    availableRooms.sort(this.compareEntries);
 
     let ownedRooms = <div/>;
     if (myRooms.length > 0) {

@@ -16,7 +16,6 @@ class UserRoom extends Component {
       ready: false,
       position: null,
       displayName: "",
-      curTime: new Date().getTime(),
       isFuture: false
     };
     // Let user into the room when the server says it's time
@@ -41,27 +40,22 @@ class UserRoom extends Component {
       this.setState({ position });
     });
 
-    if (this.isFuture()) {
+    let curTime = new Date().getTime();
+    if (this.props.room.isScheduled &&
+        this.props.room.datetime > curTime) {
       this.state.isFuture = true;
-      this.interval = setInterval(this.checkTime.bind(this), 1000);
-    }
-  }
 
-  isFuture() {
-    return this.props.room.isScheduled &&
-        this.props.room.datetime > this.state.curTime;
-  }
-
-  checkTime() {
-    this.setState({ curTime: new Date().getTime() });
-    if (!this.isFuture()) {
-      this.setState({ isFuture: false });
+      let clearFuture = () => {
+        this.setState({ isFuture: false });
+      };
+      this.timeout = setTimeout(clearFuture.bind(this), this.props.room.datetime - curTime);
+      console.log("will go in " + ((this.props.room.datetime - curTime) / 1000) + " seconds");
     }
   }
 
   componentWillUnmount() {
-    if (this.interval) {
-      clearInterval(this.interval);
+    if (this.timeout) {
+      clearTimeout(this.timeout);
     }
   }
 
