@@ -31,11 +31,12 @@ class RoomList extends Component {
       return <Loader active />;
     }
 
+    const myRooms = [];
     const availableRooms = [];
     const futureRooms = [];
 
     for (const [index, room] of this.state.rooms.entries()) {
-      if (!room.isPrivate) {
+      if (!room.isPrivate || room.owner === this.props.user) {
         let isFuture = false;
         if (room.isScheduled) {
           if (room.datetime > new Date().getTime()) {
@@ -43,12 +44,31 @@ class RoomList extends Component {
           }
         }
 
-        if (isFuture) {
-          futureRooms.push(<RoomListEntry room={room} key={index} />);
-        } else {
-          availableRooms.push(<RoomListEntry room={room} key={index} />);
+        let entry = <RoomListEntry room={room} key={index} />;
+        if (room.owner === this.props.user) {
+          myRooms.push(entry);
+        }
+
+        if (!room.isPrivate) {
+          if (isFuture) {
+            futureRooms.push(entry);
+          } else {
+            availableRooms.push(entry);
+          }
         }
       }
+    }
+
+    let ownedRooms = <div/>;
+    if (myRooms.length > 0) {
+      ownedRooms = (
+        <>
+          <h2>My rooms</h2>
+          <Table celled>
+            <Table.Body>{myRooms}</Table.Body>
+          </Table>
+        </>
+      );
     }
 
     let currentRooms = (
@@ -82,6 +102,7 @@ class RoomList extends Component {
 
     return (
       <>
+        {ownedRooms}
         {currentRooms}
         {upcomingRooms}
       </>

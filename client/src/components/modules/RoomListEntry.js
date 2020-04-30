@@ -20,7 +20,7 @@ class RoomListEntry extends Component {
     if (this.props.room.isScheduled) {
       if (this.props.room.datetime > new Date().getTime()) {
         let dateFormat = require("dateformat");
-        lastCell = dateFormat(this.props.room.datetime, "mm/dd/yyyy hh:MM TT");
+        lastCell = "Starts at " + dateFormat(this.props.room.datetime, "mm/dd/yyyy hh:MM TT");
       }
     }
 

@@ -117,7 +117,7 @@ class Home extends Component {
       <>
         {newRoomForm}
         {joinRoomForm}
-        <RoomList />
+        <RoomList user={this.props.user?.username} />
       </>
     );
 
