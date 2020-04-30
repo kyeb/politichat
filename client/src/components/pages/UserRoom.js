@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { navigate } from "@reach/router";
-import { Button, Divider, Form, Input, Label, Loader } from "semantic-ui-react";
+import { Button, Divider, Form, Input, Label, Loader, Message } from "semantic-ui-react";
 
 import VideoChat from "../modules/VideoChat";
 import { post, error } from "../../utilities";
@@ -16,6 +16,8 @@ class UserRoom extends Component {
       ready: false,
       position: null,
       displayName: "",
+      curTime: new Date().getTime(),
+      isFuture: false
     };
     // Let user into the room when the server says it's time
     socket.on("host ready", () => {
@@ -38,6 +40,29 @@ class UserRoom extends Component {
     socket.on("position update", (position) => {
       this.setState({ position });
     });
+
+    if (this.isFuture()) {
+      this.state.isFuture = true;
+      this.interval = setInterval(this.checkTime.bind(this), 1000);
+    }
+  }
+
+  isFuture() {
+    return this.props.room.isScheduled &&
+        this.props.room.datetime > this.state.curTime;
+  }
+
+  checkTime() {
+    this.setState({ curTime: new Date().getTime() });
+    if (!this.isFuture()) {
+      this.setState({ isFuture: false });
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
   }
 
   roomGone() {
@@ -99,8 +124,16 @@ class UserRoom extends Component {
         </p>;
       }
 
+      let futureMessage = <></>;
+      if (this.state.isFuture) {
+        futureMessage = <Message color="orange">
+          This room hasn't begun yet!
+        </Message>;
+      }
+
       return (
         <>
+          {futureMessage}
           <Button
             onClick={() => {
               post("/api/leavequeue", { roomID: this.props.room.id, socketID: socket.id });

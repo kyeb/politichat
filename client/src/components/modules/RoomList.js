@@ -31,6 +31,12 @@ class RoomList extends Component {
       return <Loader active />;
     }
 
+    let makeTableHeader = (headings) => (
+      <Table.Row>
+        {headings.map((header, index) => <Table.HeaderCell key={index}>{header}</Table.HeaderCell>)}
+      </Table.Row>
+    );
+
     const myRooms = [];
     const availableRooms = [];
     const futureRooms = [];
@@ -44,11 +50,12 @@ class RoomList extends Component {
           }
         }
 
-        let entry = <RoomListEntry room={room} key={index} />;
         if (room.owner === this.props.user) {
-          myRooms.push(entry);
+          let ownedEntry = <RoomListEntry room={room} key={index} owned={true} />;
+          myRooms.push(ownedEntry);
         }
 
+        let entry = <RoomListEntry room={room} key={index} />;
         if (!room.isPrivate) {
           if (isFuture) {
             futureRooms.push(entry);
@@ -64,7 +71,10 @@ class RoomList extends Component {
       ownedRooms = (
         <>
           <h2>My rooms</h2>
-          <Table celled>
+          <Table celled columns={4}>
+            <Table.Header>
+              {makeTableHeader(["Host", "Room name", "Room access", "Copy link"])}
+            </Table.Header>
             <Table.Body>{myRooms}</Table.Body>
           </Table>
         </>
@@ -81,7 +91,10 @@ class RoomList extends Component {
       currentRooms = (
         <>
           <h2>Open rooms</h2>
-          <Table celled>
+          <Table celled columns={3}>
+            <Table.Header>
+              {makeTableHeader(["Host", "Room name", "Room link"])}
+            </Table.Header>
             <Table.Body>{availableRooms}</Table.Body>
           </Table>
         </>
@@ -93,7 +106,10 @@ class RoomList extends Component {
       upcomingRooms = (
         <>
           <h2>Upcoming rooms</h2>
-          <Table celled>
+          <Table celled columns={3}>
+            <Table.Header>
+              {makeTableHeader(["Host", "Room name", "Start time"])}
+            </Table.Header>
             <Table.Body>{futureRooms}</Table.Body>
           </Table>
         </>
