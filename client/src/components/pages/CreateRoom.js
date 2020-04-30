@@ -28,7 +28,12 @@ class CreateRoom extends Component {
       isScheduled: this.state.newRoomScheduled,
       datetime: this.state.newRoomDatetime
     }).then((room) => {
-      navigate(`/room/${room.id}`);
+      if (this.state.newRoomScheduled) {
+        // if room is in the future, return to homepage
+        navigate("/");
+      } else {
+        navigate(`/room/${room.id}`);
+      }
     }).catch((err) => {
       alert(
         "Something went wrong! Try a different name or reloading.\n\nTip: room names cannot contain special characters, and make sure the URL is valid."
