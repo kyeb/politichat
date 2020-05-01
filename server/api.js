@@ -87,17 +87,20 @@ router.post("/newroom", [needsCanCreateRooms], (req, res) => {
   const roomID = Math.random().toString(36).substr(2, 9);
 
   // parse date string in format "MM-DD-YYYY hh:mm A" TODO add validity checking
-  let parts = req.body.datetime.split(/[- :]/);
-  if (parts.length !== 6) {
-    res.status(400).send({ statusMessage: "Datetime invalid" });
+  let datetime = 0;
+  if (req.body.isScheduled) {
+    let parts = req.body.datetime.split(/[- :]/);
+    if (parts.length !== 6) {
+      res.status(400).send({ statusMessage: "Datetime invalid" });
+    }
+    if (parts[5] === "AM") {
+      parts[3] = (parts[3] === "12") ? 0 : parts[3];
+    } else {
+      parts[3] = (parts[3] === "12") ? 12 : 12 + parseInt(parts[3]);
+    }
+    parts = parts.slice(0, -1).map((x) => parseInt(x));
+    datetime = new Date(parts[2], parts[0] - 1, parts[1], parts[3], parts[4]).getTime();
   }
-  if (parts[5] === "AM") {
-    parts[3] = (parts[3] === "12") ? 0 : parts[3];
-  } else {
-    parts[3] = (parts[3] === "12") ? 12 : 12 + parseInt(parts[3]);
-  }
-  parts = parts.slice(0, -1).map((x) => parseInt(x));
-  let datetime = new Date(parts[2], parts[0] - 1, parts[1], parts[3], parts[4]);
 
   // make a room object with keys id, roomName, owner, current user, and queue
   const room_temp = {
@@ -111,7 +114,7 @@ router.post("/newroom", [needsCanCreateRooms], (req, res) => {
     exitMessage: req.body.exitMessage,
     isPrivate: req.body.isPrivate,
     isScheduled: req.body.isScheduled,
-    datetime: datetime.getTime(),
+    datetime: datetime,
     userInfos: {} // user infos keyed by socketID
   };
 
@@ -267,8 +270,9 @@ router.post("/submitInfo", (req, res) => {
   }
 
   // ensure is valid email
-  let pattern = /\S+@\S+\.\S+/;
-  if (pattern.test(req.body.userInfo.email)) {
+  let emailOkay = !req.body.userInfo.email || /\S+@\S+\.\S+/.test(req.body.userInfo.email);
+  let phoneOkay = !req.body.userInfo.phone || /[\d()\- ]+/.test(req.body.userInfo.phone);
+  if (emailOkay && phoneOkay) {
     room.userInfos[req.body.socketID] = req.body.userInfo;
     res.send({ success: true });
   } else {

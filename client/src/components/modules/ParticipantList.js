@@ -16,7 +16,7 @@ class ParticipantList extends Component {
     let createRow = (info, index) => {
       return (
         <Table.Row key={index}>
-          {["name", "email"].map((prop, ind) => (
+          {["name", "email", "phone", "town"].map((prop, ind) => (
             <Table.Cell key={ind}>
               {info[prop]}
             </Table.Cell>
@@ -28,9 +28,9 @@ class ParticipantList extends Component {
     return (
       <>
         <h3>Participant information</h3>
-        <Table celled columns={2}>
+        <Table celled columns={4}>
           <Table.Header>
-            {makeTableHeader(["Name", "Email"])}
+            {makeTableHeader(["Name", "Email Address", "Phone Number", "Town"])}
           </Table.Header>
           <Table.Body>
             {this.props.infos.map((info, index) => createRow(info, index))}

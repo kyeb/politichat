@@ -11,6 +11,7 @@ class UserRoom extends Component {
     super(props);
     this.state = {
       emailError: "",
+      phoneError: "",
       infoSubmitted: false,
       InQueue: false,
       position: null,
@@ -80,18 +81,24 @@ class UserRoom extends Component {
   }
 
   handleSubmitInfo() {
-    let pattern = /\S+@\S+\.\S+/;
-    if (pattern.test(this.state.userInfo.email)) {
+    let emailOkay = !this.state.userInfo.email || /\S+@\S+\.\S+/.test(this.state.userInfo.email);
+    let phoneOkay = !this.state.userInfo.phone || /[\d()\- ]+/.test(this.state.userInfo.phone);
+
+    if (emailOkay && phoneOkay) {
       this.setState({
         infoSubmitted: true,
-        emailError: ""
+        emailError: "",
+        phoneError: ""
       });
 
       post("/api/submitInfo", { roomID: this.props.room.id, socketID: socket.id, userInfo: this.state.userInfo })
         .then(() => {})
         .catch((err) => error(err, "Submitting information failed"));
     } else {
-      this.setState({ emailError: "Enter a valid email address" });
+      this.setState({
+        emailError: emailOkay ? "" : "Enter a valid email address",
+        phoneError: phoneOkay ? "" : "Enter a valid phone number"
+      });
     }
   }
 
@@ -144,13 +151,11 @@ class UserRoom extends Component {
         </p>;
       }
 
-      let emailErrorLabel = <div />;
-      if (this.state.emailError) {
-        emailErrorLabel = (
-          <Label pointing prompt>
-            {this.state.emailError}
-          </Label>
-        );
+      let makeErrorLabel = (error) => {
+        if (error) {
+          return <Label pointing prompt>{error}</Label>
+        }
+        return <></>;
       }
 
       return (
@@ -170,7 +175,7 @@ class UserRoom extends Component {
           <p> {this.props.room.waitMessage} </p>
           <br />
           <Divider />
-          <p>Enter your email address to stay updated!</p>
+          <p>Enter your information to stay updated!</p>
           <Form>
             <Form.Field className="userroom-info">
               <Input
@@ -184,7 +189,34 @@ class UserRoom extends Component {
                 })}
                 value={this.state.userInfo.email}
               />
-              {emailErrorLabel}
+              {makeErrorLabel(this.state.emailError)}
+            </Form.Field>
+            <Form.Field className="userroom-info">
+              <Input
+                className="userroom-phone"
+                placeholder="Phone Number"
+                onChange={(event) => this.setState({
+                  userInfo: {
+                    ...this.state.userInfo,
+                    phone: event.target.value
+                  }
+                })}
+                value={this.state.userInfo.phone}
+              />
+              {makeErrorLabel(this.state.phoneError)}
+            </Form.Field>
+            <Form.Field className="userroom-info">
+              <Input
+                className="userroom-town"
+                placeholder="Town"
+                onChange={(event) => this.setState({
+                  userInfo: {
+                    ...this.state.userInfo,
+                    town: event.target.value
+                  }
+                })}
+                value={this.state.userInfo.town}
+              />
             </Form.Field>
             <Form.Button
               primary
