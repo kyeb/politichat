@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import ParticipantList from "../modules/ParticipantList";
 import { Loader, Button, Message } from "semantic-ui-react";
 import { get, error } from "../../utilities";
 import { navigate } from "@reach/router";
@@ -43,31 +44,17 @@ class ExitPage extends Component {
         return <Loader active />;
       }
 
-      let userInfos = (
-        <div>
-          <p>
-            Here is the list of information of participants:
-          </p>
-          {Object.values(this.state.room.userInfos).map((info, index) => (
-            <p key={index}>
-              {index + 1}. {info.name}
-            </p>
-          ))}
-          <span />
-        </div>
-      );
-
       return (
         <>
-          <h3>
+          <h2>
             Thank you for hosting a room on Politichat
             {this.props.user && <>, {this.props.user.username}</>}!
-          </h3>
+          </h2>
           <p>
             Please send any questions or feedback to
             <a href="mailto:politichat@mit.edu"> politichat@mit.edu</a>
           </p>
-          {userInfos}
+          <ParticipantList infos={Object.values(this.state.room.userInfos)} />
           <Button onClick={() => navigate("/")} content="Exit" />
         </>
       );
