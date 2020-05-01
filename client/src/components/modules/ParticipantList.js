@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Table } from "semantic-ui-react";
+import { CSVLink, CSVDownload } from "react-csv";
 
 class ParticipantList extends Component {
   constructor(props) {
@@ -13,10 +14,13 @@ class ParticipantList extends Component {
       </Table.Row>
     );
 
+    let orderedProps = ["name", "email", "phone", "town"];
+    let orderedHeaders = ["Name", "Email Address", "Phone Number", "Town"];
+
     let createRow = (info, index) => {
       return (
         <Table.Row key={index}>
-          {["name", "email", "phone", "town"].map((prop, ind) => (
+          {orderedProps.map((prop, ind) => (
             <Table.Cell key={ind}>
               {info[prop]}
             </Table.Cell>
@@ -25,12 +29,21 @@ class ParticipantList extends Component {
       );
     }
 
+    let csvData = this.props.infos.map((info) => {
+      return orderedProps.map((prop) => info[prop]);
+    });
+    csvData.unshift(orderedHeaders);
+
     return (
       <>
         <h3>Participant information</h3>
+
+        Download information as a
+        <CSVLink data={csvData} filename={this.props.roomId + "_participantinfo.csv"}> csv file</CSVLink>
+
         <Table celled columns={4}>
           <Table.Header>
-            {makeTableHeader(["Name", "Email Address", "Phone Number", "Town"])}
+            {makeTableHeader(orderedHeaders)}
           </Table.Header>
           <Table.Body>
             {this.props.infos.map((info, index) => createRow(info, index))}

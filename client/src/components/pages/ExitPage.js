@@ -54,7 +54,7 @@ class ExitPage extends Component {
             Please send any questions or feedback to
             <a href="mailto:politichat@mit.edu"> politichat@mit.edu</a>
           </p>
-          <ParticipantList infos={Object.values(this.state.room.userInfos)} />
+          <ParticipantList infos={Object.values(this.state.room.userInfos)} roomId={this.state.room.id} />
           <Button onClick={() => navigate("/")} content="Exit" />
         </>
       );
