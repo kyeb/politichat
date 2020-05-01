@@ -49,7 +49,6 @@ class UserRoom extends Component {
         this.setState({ isFuture: false });
       };
       this.timeout = setTimeout(clearFuture.bind(this), this.props.room.datetime - curTime);
-      console.log("will go in " + ((this.props.room.datetime - curTime) / 1000) + " seconds");
     }
   }
 
