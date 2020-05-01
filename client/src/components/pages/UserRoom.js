@@ -10,27 +10,32 @@ class UserRoom extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      emailAddress: "",
       emailError: "",
-      emailSubmitted: false,
-      ready: false,
+      infoSubmitted: false,
+      InQueue: false,
       position: null,
-      displayName: "",
+      userInfo: {
+        name: "",
+        email: "",
+        phone: "",
+        town: ""
+      },
+      joinedQueue: false,
       isFuture: false
     };
     // Let user into the room when the server says it's time
     socket.on("host ready", () => {
-      this.setState({ ready: true });
+      this.setState({ inCall: true });
     });
     // If user reloads page, re-join the room
-    socket.on("connect", () => {
-      this.joinRoom();
-    });
+    //socket.on("connect", () => {
+    //  this.joinRoom();
+    //}); @kye what does this do? when I reload this isn't triggered (it just rerenders)
     socket.on("leave please", () => {
       this.exitLine();
     });
     socket.on("room gone", () => {
-      if (this.state.ready) {
+      if (this.state.inCall) {
         this.exitLine();
       } else {
         this.roomGone();
@@ -67,43 +72,65 @@ class UserRoom extends Component {
     navigate(`/exit/done/${this.props.room.id}`);
   }
 
-  joinRoom = () => {
-    post("/api/join", { roomID: this.props.room.id, socketID: socket.id })
+  handleJoinQueue() {
+    post("/api/join", { roomID: this.props.room.id, socketID: socket.id, name: this.state.userInfo.name })
       .then(() => {})
       .catch((err) => error(err, "Joining room failed"));
+    this.setState({ joinedQueue: true });
   }
 
-  handleSubmitEmail() {
+  handleSubmitInfo() {
     let pattern = /\S+@\S+\.\S+/;
-    if (pattern.test(this.state.emailAddress)) {
+    if (pattern.test(this.state.userInfo.email)) {
       this.setState({
-        emailSubmitted: true,
+        infoSubmitted: true,
         emailError: ""
       });
 
-      post("/api/submitEmail", { roomID: this.props.room.id, email: this.state.emailAddress })
+      post("/api/submitInfo", { roomID: this.props.room.id, socketID: socket.id, userInfo: this.state.userInfo })
         .then(() => {})
-        .catch((err) => error(err, "Submitting email failed"));
+        .catch((err) => error(err, "Submitting information failed"));
     } else {
       this.setState({ emailError: "Enter a valid email address" });
     }
   }
 
-  componentDidMount() {
-    if (socket.id) {
-      this.joinRoom();
-    }
-  }
-
   render() {
-    if (!this.state.ready) {
-      let emailErrorLabel = <div />;
-      if (this.state.emailError) {
-        emailErrorLabel = (
-          <Label pointing prompt>
-            {this.state.emailError}
-          </Label>
-        );
+    if (!this.state.joinedQueue) {
+      return (
+        <>
+          <p>Enter your name below to join the queue to speak with {this.props.room.owner}!</p>
+          <Form>
+            <Form.Input
+              className="userroom-name"
+              placeholder="Enter your name"
+              onChange={(event) => this.setState({
+                userInfo: {
+                  ...this.state.userInfo,
+                  name: event.target.value
+                }
+              })}
+              value={this.state.userInfo.name}
+            />
+            <Form.Button
+              primary
+              className="userroom-namebutton"
+              onClick={this.handleJoinQueue.bind(this)}
+              type="button"
+            >
+              Join Queue
+            </Form.Button>
+          </Form>
+        </>
+      );
+    }
+
+    if (!this.state.inCall) {
+      let futureMessage = <></>;
+      if (this.state.isFuture) {
+        futureMessage = <Message color="orange">
+          This room hasn't begun yet!
+        </Message>;
       }
 
       let websiteLink = <div />;
@@ -117,11 +144,13 @@ class UserRoom extends Component {
         </p>;
       }
 
-      let futureMessage = <></>;
-      if (this.state.isFuture) {
-        futureMessage = <Message color="orange">
-          This room hasn't begun yet!
-        </Message>;
+      let emailErrorLabel = <div />;
+      if (this.state.emailError) {
+        emailErrorLabel = (
+          <Label pointing prompt>
+            {this.state.emailError}
+          </Label>
+        );
       }
 
       return (
@@ -140,33 +169,29 @@ class UserRoom extends Component {
           {websiteLink}
           <p> {this.props.room.waitMessage} </p>
           <br />
-          <p>Set a name to appear as in the video chat:</p>
-          <Input
-            className="userroom-displayname"
-            placeholder="Display name"
-            onChange={(event) => this.setState({ displayName: event.target.value })}
-            value={this.state.displayName}
-          />
           <Divider />
           <p>Enter your email address to stay updated!</p>
           <Form>
-            <Form.Field className="userroom-email">
+            <Form.Field className="userroom-info">
               <Input
-                className="userroom-emailaddr"
+                className="userroom-email"
                 placeholder="Email address"
-                onChange={(event) => this.setState({ emailAddress: event.target.value })}
-                value={this.state.emailAddress}
-                disabled={this.state.emailSubmitted}
+                onChange={(event) => this.setState({
+                  userInfo: {
+                    ...this.state.userInfo,
+                    email: event.target.value
+                  }
+                })}
+                value={this.state.userInfo.email}
               />
               {emailErrorLabel}
             </Form.Field>
             <Form.Button
               primary
-              className="userroom-emailbutton"
-              onClick={this.handleSubmitEmail.bind(this)}
-              disabled={!this.state.emailAddress || this.state.emailSubmitted}
+              className="userroom-infobutton"
+              onClick={this.handleSubmitInfo.bind(this)}
             >
-              {this.state.emailSubmitted ? "Submitted!" : "Submit"}
+              {this.state.infoSubmitted ? "Update" : "Submit"}
             </Form.Button>
           </Form>
         </>

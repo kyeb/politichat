@@ -43,22 +43,19 @@ class ExitPage extends Component {
         return <Loader active />;
       }
 
-      let emails = <div />;
-      if (this.state.room.emailList) {
-        emails = (
-          <div>
-            <p>
-              Here is the list of emails of participants:
+      let userInfos = (
+        <div>
+          <p>
+            Here is the list of information of participants:
+          </p>
+          {Object.values(this.state.room.userInfos).map((info, index) => (
+            <p key={index}>
+              {index + 1}. {info.name}
             </p>
-            {this.state.room.emailList.map((email, index) => (
-              <p key={index}>
-                {index + 1}. {email}
-              </p>
-            ))}
-            <span />
-          </div>
-        );
-      }
+          ))}
+          <span />
+        </div>
+      );
 
       return (
         <>
@@ -70,7 +67,7 @@ class ExitPage extends Component {
             Please send any questions or feedback to
             <a href="mailto:politichat@mit.edu"> politichat@mit.edu</a>
           </p>
-          {emails}
+          {userInfos}
           <Button onClick={() => navigate("/")} content="Exit" />
         </>
       );

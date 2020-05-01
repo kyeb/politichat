@@ -111,7 +111,8 @@ router.post("/newroom", [needsCanCreateRooms], (req, res) => {
     exitMessage: req.body.exitMessage,
     isPrivate: req.body.isPrivate,
     isScheduled: req.body.isScheduled,
-    datetime: datetime.getTime()
+    datetime: datetime.getTime(),
+    userInfos: {} // user infos keyed by socketID
   };
 
   // add room object to array of rooms
@@ -239,6 +240,11 @@ router.post("/join", (req, res) => {
   room.queue.push(userSocket.id);
   logger.info(`User ${userSocket.id} has joined the queue`);
 
+  // add the name to the userInfos (later populated with email, etc.)
+  room.userInfos[req.body.socketID] = {
+    name: req.body.name
+  };
+
   // set up a callback so that if the user disconnects, they get removed from
   //   the queue
   userSocket.on("disconnect", () => {
@@ -252,22 +258,18 @@ router.post("/join", (req, res) => {
   res.send({ success: true });
 });
 
-router.post("/submitEmail", (req, res) => {
-  // add an email address to the room's email list
+router.post("/submitInfo", (req, res) => {
+  // add/update a user's info
   const room = rooms.find((e) => e.id === req.body.roomID);
   if (!room) {
     res.status(404).send({});
     return;
   }
 
-  if (!room.emailList) {
-    room.emailList = [];
-  }
-
   // ensure is valid email
   let pattern = /\S+@\S+\.\S+/;
-  if (pattern.test(req.body.email)) {
-    room.emailList.push(req.body.email);
+  if (pattern.test(req.body.userInfo.email)) {
+    room.userInfos[req.body.socketID] = req.body.userInfo;
     res.send({ success: true });
   } else {
     res.status(400).send({});
