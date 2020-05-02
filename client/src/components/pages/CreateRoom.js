@@ -19,6 +19,22 @@ class CreateRoom extends Component {
   }
 
   handleNewRoom = () => {
+    // parse date string in format "MM-DD-YYYY hh:mm A" TODO add validity checking
+    let datetime = 0;
+    if (this.state.newRoomScheduled) {
+      let parts = this.state.newRoomDatetime.split(/[- :]/);
+      if (parts.length !== 6) {
+        alert("Scheduled time invalid");
+      }
+      if (parts[5] === "AM") {
+        parts[3] = (parts[3] === "12") ? 0 : parts[3];
+      } else {
+        parts[3] = (parts[3] === "12") ? 12 : 12 + parseInt(parts[3]);
+      }
+      parts = parts.slice(0, -1).map((x) => parseInt(x));
+      datetime = new Date(parts[2], parts[0] - 1, parts[1], parts[3], parts[4]).getTime();
+    }
+
     post("/api/newroom", {
       roomName: this.state.newRoomName,
       roomLink: this.state.newRoomLink,
@@ -26,7 +42,7 @@ class CreateRoom extends Component {
       exitMessage: this.state.newRoomExit,
       isPrivate: this.state.newRoomPrivate,
       isScheduled: this.state.newRoomScheduled,
-      datetime: this.state.newRoomDatetime
+      datetime: datetime
     }).then((room) => {
       if (this.state.newRoomScheduled) {
         // if room is in the future, return to homepage
