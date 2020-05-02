@@ -78,8 +78,7 @@ app.use((err, req, res, next) => {
     logger.error(err);
   }
 
-  res.status(status);
-  res.send({
+  res.status(status).send({
     status: status,
     message: err.message,
   });

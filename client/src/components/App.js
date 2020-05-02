@@ -86,7 +86,13 @@ class App extends Component {
         </header>
         <Divider />
         <Router>
-          <Home path="/" setUser={this.setUser} logout={this.handleLogout} user={this.state.user} />
+          <Home
+            path="/"
+            setUser={this.setUser}
+            logout={this.handleLogout}
+            user={this.state.user}
+            socketConnected={this.state.socketConnected}
+          />
           <CreateRoom path="/create" user={this.state.user} />
           <AdminPanel path="/admin" user={this.state.user} />
           <RoomContainer

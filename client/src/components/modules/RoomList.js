@@ -52,7 +52,9 @@ class RoomList extends Component {
 
     let makeTableHeader = (headings) => (
       <Table.Row>
-        {headings.map((header, index) => <Table.HeaderCell key={index}>{header}</Table.HeaderCell>)}
+        {headings.map((header, index) => (
+          <Table.HeaderCell key={index}>{header}</Table.HeaderCell>
+        ))}
       </Table.Row>
     );
 
@@ -90,7 +92,7 @@ class RoomList extends Component {
     futureRooms.sort(this.compareEntries);
     availableRooms.sort(this.compareEntries);
 
-    let ownedRooms = <div/>;
+    let ownedRooms = <div />;
     if (myRooms.length > 0) {
       ownedRooms = (
         <>
@@ -107,8 +109,8 @@ class RoomList extends Component {
 
     let currentRooms = (
       <Message>
-        Sorry, there are no available public rooms right now. Check back again later, or create
-        one yourself!
+        There are no available public rooms right now. Check back again later, or create one
+        yourself!
       </Message>
     );
     if (availableRooms.length > 0) {
@@ -116,24 +118,20 @@ class RoomList extends Component {
         <>
           <h2>Open rooms</h2>
           <Table celled columns={3}>
-            <Table.Header>
-              {makeTableHeader(["Host", "Room name", "Room link"])}
-            </Table.Header>
+            <Table.Header>{makeTableHeader(["Host", "Room name", "Room link"])}</Table.Header>
             <Table.Body>{availableRooms}</Table.Body>
           </Table>
         </>
       );
     }
 
-    let upcomingRooms = <div/>;
+    let upcomingRooms = <div />;
     if (futureRooms.length > 0) {
       upcomingRooms = (
         <>
           <h2>Upcoming rooms</h2>
           <Table celled columns={3}>
-            <Table.Header>
-              {makeTableHeader(["Host", "Room name", "Start time"])}
-            </Table.Header>
+            <Table.Header>{makeTableHeader(["Host", "Room name", "Start time"])}</Table.Header>
             <Table.Body>{futureRooms}</Table.Body>
           </Table>
         </>

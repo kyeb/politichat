@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { navigate } from "@reach/router";
-import { Button, Loader } from "semantic-ui-react";
+import { Button, Loader, Message } from "semantic-ui-react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import VideoChat from "../modules/VideoChat";
@@ -63,16 +63,19 @@ class HostRoom extends Component {
           <Button primary disabled={this.state.queueLength === 0} onClick={this.handleNext}>
             Next participant
           </Button>
+          Number of participants in queue: {this.state.queueLength}
           <Button negative floated="right" onClick={this.handleEnd}>
             End session
           </Button>
-          <CopyToClipboard text={window.location.href} onCopy={() => this.setState({ copied: true })}>
+          <CopyToClipboard
+            text={window.location.href}
+            onCopy={() => this.setState({ copied: true })}
+          >
             <Button floated="right">
               {this.state.copied ? "Room link copied!" : "Copy room link"}
             </Button>
           </CopyToClipboard>
         </div>
-        <div>Number of participants in queue: {this.state.queueLength}</div>
       </div>
     );
 
@@ -80,7 +83,7 @@ class HostRoom extends Component {
       // remove the "Room link copied!" after two seconds
       setTimeout(() => {
         this.setState({
-          copied: false
+          copied: false,
         });
       }, 2000);
     }

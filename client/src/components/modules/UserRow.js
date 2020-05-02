@@ -64,6 +64,8 @@ class UserRow extends PureComponent {
       <Table.Row>
         <Table.Cell>{name}</Table.Cell>
 
+        <Table.Cell>{this.props.user.displayName}</Table.Cell>
+
         <Table.Cell collapsing>
           <Button
             onClick={this.handleToggleWorker}

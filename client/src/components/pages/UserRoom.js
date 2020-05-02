@@ -19,10 +19,10 @@ class UserRoom extends Component {
         name: "",
         email: "",
         phone: "",
-        town: ""
+        town: "",
       },
       joinedQueue: false,
-      isFuture: false
+      isFuture: false,
     };
     // Let user into the room when the server says it's time
     socket.on("host ready", () => {
@@ -47,8 +47,7 @@ class UserRoom extends Component {
     });
 
     let curTime = new Date().getTime();
-    if (this.props.room.isScheduled &&
-        this.props.room.datetime > curTime) {
+    if (this.props.room.isScheduled && this.props.room.datetime > curTime) {
       this.state.isFuture = true;
 
       let clearFuture = () => {
@@ -73,12 +72,16 @@ class UserRoom extends Component {
     navigate(`/exit/done/${this.props.room.id}`);
   }
 
-  handleJoinQueue() {
-    post("/api/join", { roomID: this.props.room.id, socketID: socket.id, name: this.state.userInfo.name })
+  handleJoinQueue = () => {
+    post("/api/join", {
+      roomID: this.props.room.id,
+      socketID: socket.id,
+      name: this.state.userInfo.name,
+    })
       .then(() => {})
       .catch((err) => error(err, "Joining room failed"));
     this.setState({ joinedQueue: true });
-  }
+  };
 
   handleSubmitInfo() {
     let emailOkay = !this.state.userInfo.email || /\S+@\S+\.\S+/.test(this.state.userInfo.email);
@@ -88,16 +91,20 @@ class UserRoom extends Component {
       this.setState({
         infoSubmitted: true,
         emailError: "",
-        phoneError: ""
+        phoneError: "",
       });
 
-      post("/api/submitInfo", { roomID: this.props.room.id, socketID: socket.id, userInfo: this.state.userInfo })
+      post("/api/submitInfo", {
+        roomID: this.props.room.id,
+        socketID: socket.id,
+        userInfo: this.state.userInfo,
+      })
         .then(() => {})
         .catch((err) => error(err, "Submitting information failed"));
     } else {
       this.setState({
         emailError: emailOkay ? "" : "Enter a valid email address",
-        phoneError: phoneOkay ? "" : "Enter a valid phone number"
+        phoneError: phoneOkay ? "" : "Enter a valid phone number",
       });
     }
   }
@@ -106,23 +113,28 @@ class UserRoom extends Component {
     if (!this.state.joinedQueue) {
       return (
         <>
-          <p>Enter your name below to join the queue to speak with {this.props.room.owner}!</p>
-          <Form>
+          <p>
+            Enter your name below to join the queue to speak with {this.props.room.ownerDisplayName}
+            !
+          </p>
+          <Form onSubmit={this.handleJoinQueue}>
             <Form.Input
               className="userroom-name"
               placeholder="Enter your name"
-              onChange={(event) => this.setState({
-                userInfo: {
-                  ...this.state.userInfo,
-                  name: event.target.value
-                }
-              })}
+              onChange={(event) =>
+                this.setState({
+                  userInfo: {
+                    ...this.state.userInfo,
+                    name: event.target.value,
+                  },
+                })
+              }
               value={this.state.userInfo.name}
             />
             <Form.Button
               primary
               className="userroom-namebutton"
-              onClick={this.handleJoinQueue.bind(this)}
+              onClick={this.handleJoinQueue}
               type="button"
             >
               Join Queue
@@ -135,28 +147,32 @@ class UserRoom extends Component {
     if (!this.state.inCall) {
       let futureMessage = <></>;
       if (this.state.isFuture) {
-        futureMessage = <Message color="orange">
-          This room hasn't begun yet!
-        </Message>;
+        futureMessage = <Message color="orange">This room hasn't begun yet!</Message>;
       }
 
       let websiteLink = <div />;
       if (this.props.room.link) {
-        websiteLink = <p>
-          While you're waiting, check out{" "}
-          <a href={this.props.room.link} target="_blank">
-            {" "}
-            my website!
-          </a>
-        </p>;
+        websiteLink = (
+          <p>
+            While you're waiting, check out{" "}
+            <a href={this.props.room.link} target="_blank">
+              {" "}
+              my website!
+            </a>
+          </p>
+        );
       }
 
       let makeErrorLabel = (error) => {
         if (error) {
-          return <Label pointing prompt>{error}</Label>
+          return (
+            <Label pointing prompt>
+              {error}
+            </Label>
+          );
         }
         return <></>;
-      }
+      };
 
       return (
         <>
@@ -166,66 +182,75 @@ class UserRoom extends Component {
               post("/api/leavequeue", { roomID: this.props.room.id, socketID: socket.id });
               navigate("/");
             }}
-          >
-            Leave queue
-          </Button>
-          <p>Waiting in line to speak to {this.props.room.owner}...</p>
+            content="Leave queue"
+            floated="right"
+          />
+          <p>Waiting in line to speak to {this.props.room.ownerDisplayName}...</p>
           {this.state.position && <p>You are position {this.state.position} in line.</p>}
-          {websiteLink}
-          <p> {this.props.room.waitMessage} </p>
-          <br />
           <Divider />
-          <p>Enter your information to stay updated!</p>
-          <Form>
-            <Form.Field className="userroom-info">
-              <Input
-                className="userroom-email"
-                placeholder="Email address"
-                onChange={(event) => this.setState({
-                  userInfo: {
-                    ...this.state.userInfo,
-                    email: event.target.value
+          <div className="twocolumn">
+            <div className="UserRoom-customcontent">
+              {websiteLink}
+              <p> {this.props.room.waitMessage} </p>
+            </div>
+            <Form>
+              <p>Enter your information to stay updated!</p>
+              <Form.Field className="userroom-info">
+                <Input
+                  className="userroom-email"
+                  placeholder="Email address"
+                  onChange={(event) =>
+                    this.setState({
+                      userInfo: {
+                        ...this.state.userInfo,
+                        email: event.target.value,
+                      },
+                    })
                   }
-                })}
-                value={this.state.userInfo.email}
-              />
-              {makeErrorLabel(this.state.emailError)}
-            </Form.Field>
-            <Form.Field className="userroom-info">
-              <Input
-                className="userroom-phone"
-                placeholder="Phone Number"
-                onChange={(event) => this.setState({
-                  userInfo: {
-                    ...this.state.userInfo,
-                    phone: event.target.value
+                  value={this.state.userInfo.email}
+                />
+                {makeErrorLabel(this.state.emailError)}
+              </Form.Field>
+              <Form.Field className="userroom-info">
+                <Input
+                  className="userroom-phone"
+                  placeholder="Phone Number"
+                  onChange={(event) =>
+                    this.setState({
+                      userInfo: {
+                        ...this.state.userInfo,
+                        phone: event.target.value,
+                      },
+                    })
                   }
-                })}
-                value={this.state.userInfo.phone}
-              />
-              {makeErrorLabel(this.state.phoneError)}
-            </Form.Field>
-            <Form.Field className="userroom-info">
-              <Input
-                className="userroom-town"
-                placeholder="Town"
-                onChange={(event) => this.setState({
-                  userInfo: {
-                    ...this.state.userInfo,
-                    town: event.target.value
+                  value={this.state.userInfo.phone}
+                />
+                {makeErrorLabel(this.state.phoneError)}
+              </Form.Field>
+              <Form.Field className="userroom-info">
+                <Input
+                  className="userroom-town"
+                  placeholder="Town"
+                  onChange={(event) =>
+                    this.setState({
+                      userInfo: {
+                        ...this.state.userInfo,
+                        town: event.target.value,
+                      },
+                    })
                   }
-                })}
-                value={this.state.userInfo.town}
-              />
-            </Form.Field>
-            <Form.Button
-              primary
-              className="userroom-infobutton"
-              onClick={this.handleSubmitInfo.bind(this)}
-            >
-              {this.state.infoSubmitted ? "Update" : "Submit"}
-            </Form.Button>
-          </Form>
+                  value={this.state.userInfo.town}
+                />
+              </Form.Field>
+              <Form.Button
+                primary
+                className="userroom-infobutton"
+                onClick={this.handleSubmitInfo.bind(this)}
+              >
+                {this.state.infoSubmitted ? "Update" : "Submit"}
+              </Form.Button>
+            </Form>
+          </div>
         </>
       );
     }

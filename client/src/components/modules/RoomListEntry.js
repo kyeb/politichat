@@ -7,7 +7,7 @@ class RoomListEntry extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      copiedIds: []
+      copiedIds: [],
     };
   }
 
@@ -27,9 +27,11 @@ class RoomListEntry extends Component {
       if (this.props.room.datetime > new Date().getTime()) {
         let dateFormat = require("dateformat");
         let premessage = this.props.owned ? "Starts at " : "";
-        lastCell = <Table.Cell>
-          {premessage + dateFormat(this.props.room.datetime, "mm/dd/yyyy hh:MM TT")}
-        </Table.Cell>;
+        lastCell = (
+          <Table.Cell>
+            {premessage + dateFormat(this.props.room.datetime, "mm/dd/yyyy hh:MM TT")}
+          </Table.Cell>
+        );
       }
     }
 
@@ -38,20 +40,23 @@ class RoomListEntry extends Component {
       let linkToCopy = window.location.href.split("/")[2] + "/room/" + this.props.room.id;
       let newCopiedIds = [...this.state.copiedIds, this.props.room.id];
       let isCopied = this.state.copiedIds.includes(this.props.room.id);
-      copyLink = <Table.Cell textAlign="center">
-        <CopyToClipboard text={linkToCopy} onCopy={() => this.setState({ copiedIds: newCopiedIds })}>
-          <Button>
-            {isCopied ? "Room link copied!" : "Copy room link"}
-          </Button>
-        </CopyToClipboard>
-      </Table.Cell>
+      copyLink = (
+        <Table.Cell textAlign="center">
+          <CopyToClipboard
+            text={linkToCopy}
+            onCopy={() => this.setState({ copiedIds: newCopiedIds })}
+          >
+            <Button>{isCopied ? "Room link copied!" : "Copy room link"}</Button>
+          </CopyToClipboard>
+        </Table.Cell>
+      );
     }
 
     if (this.state.copiedIds.length > 0) {
       // remove the "Room link copied!" after two seconds
       setTimeout(() => {
         this.setState({
-          copiedIds: []
+          copiedIds: [],
         });
       }, 2000);
     }
@@ -59,7 +64,7 @@ class RoomListEntry extends Component {
     return (
       <>
         <Table.Row>
-          <Table.Cell>{this.props.room.owner}</Table.Cell>
+          <Table.Cell>{this.props.room.ownerDisplayName}</Table.Cell>
           <Table.Cell>{this.props.room.roomName}</Table.Cell>
           {lastCell}
           {copyLink}

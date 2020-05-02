@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import AuthController from "../modules/AuthController";
 import RoomList from "../modules/RoomList";
-import { Form, Input, Label, Message } from "semantic-ui-react";
-import { get } from "../../utilities";
+import { Form, Input, Label, Message, Divider, Loader } from "semantic-ui-react";
+import { get, post } from "../../utilities";
 import { navigate } from "@reach/router";
 
 class Home extends Component {
@@ -11,7 +11,8 @@ class Home extends Component {
     this.state = {
       joinRoomError: "",
       joinRoomId: "",
-      roomIds: -1 // placeholder indicating hasn't loaded
+      newDisplayName: "",
+      roomIds: -1, // placeholder indicating hasn't loaded
     };
   }
 
@@ -42,7 +43,24 @@ class Home extends Component {
     }
   };
 
+  handleUpdateDisplayName = () => {
+    post("/api/displayname", { displayName: this.state.newDisplayName })
+      .then((res) => {
+        if (res.success) {
+          this.props.user.displayName = this.state.newDisplayName;
+          this.setState({ newDisplayName: "" });
+        }
+      })
+      .catch((err) => {
+        alert("Error when updating display name. See console for more details.");
+      });
+  };
+
   render() {
+    if (!this.props.socketConnected) {
+      return <Loader active />;
+    }
+
     let joinRoomErrorLabel = <div />;
     if (this.state.joinRoomError) {
       joinRoomErrorLabel = (
@@ -78,13 +96,15 @@ class Home extends Component {
 
     const loggedOutLanding = (
       <>
-        <AuthController
-          logout={this.props.logout}
-          loggedIn={this.props.user !== undefined}
-          setUser={this.props.setUser}
-          providers={["google"]}
-        />
-        {joinRoomForm}
+        <div className="twocolumn">
+          <AuthController
+            logout={this.props.logout}
+            loggedIn={this.props.user !== undefined}
+            setUser={this.props.setUser}
+            providers={["google"]}
+          />
+          {joinRoomForm}
+        </div>
         <RoomList />
       </>
     );
@@ -113,11 +133,29 @@ class Home extends Component {
       );
     }
 
+    const updateDisplayName = (
+      <Form>
+        <h3>Update your display name</h3>
+        <p>This is the name users will see when joining your rooms.</p>
+        <Input
+          placeholder={this.props.user?.displayName}
+          action={{ content: "Update", onClick: this.handleUpdateDisplayName, primary: true }}
+          onChange={(event) => this.setState({ newDisplayName: event.target.value })}
+          value={this.state.newDisplayName}
+        />
+      </Form>
+    );
+
     const loggedInLanding = (
       <>
-        {newRoomForm}
-        {joinRoomForm}
+        <div className="twocolumn">
+          <div className="Home-joinroom">{joinRoomForm}</div>
+          <div className="Home-newroom">{newRoomForm}</div>
+        </div>
+        <Divider />
         <RoomList user={this.props.user?.username} />
+        <Divider />
+        {updateDisplayName}
       </>
     );
 

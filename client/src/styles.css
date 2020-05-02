@@ -41,6 +41,11 @@ header {
   width: 30vw;
 }
 
+.twocolumn {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
 footer {
   position: absolute;
   bottom: 10px;

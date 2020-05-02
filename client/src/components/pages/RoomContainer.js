@@ -29,7 +29,7 @@ class RoomContainer extends Component {
     if (this.state.error) {
       return (
         <>
-          <Message negative>Sorry, this room does not seem to exist right now :/</Message>
+          <Message negative>This room does not seem to exist right now :/</Message>
           <Button onClick={() => navigate("/")}>Go home</Button>
         </>
       );

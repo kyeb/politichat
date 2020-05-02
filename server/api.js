@@ -91,6 +91,7 @@ router.post("/newroom", [needsCanCreateRooms], (req, res) => {
     id: roomID,
     roomName: req.body.roomName,
     owner: req.user.username,
+    ownerDisplayName: req.user.displayName,
     current: null,
     queue: [],
     link: req.body.roomLink,
@@ -99,7 +100,7 @@ router.post("/newroom", [needsCanCreateRooms], (req, res) => {
     isPrivate: req.body.isPrivate,
     isScheduled: req.body.isScheduled,
     datetime: req.body.datetime,
-    userInfos: {} // user infos keyed by socketID
+    userInfos: {}, // user infos keyed by socketID
   };
 
   // add room object to array of rooms
@@ -229,7 +230,7 @@ router.post("/join", (req, res) => {
 
   // add the name to the userInfos (later populated with email, etc.)
   room.userInfos[req.body.socketID] = {
-    name: req.body.name
+    name: req.body.name,
   };
 
   // set up a callback so that if the user disconnects, they get removed from
@@ -296,6 +297,14 @@ router.post("/next", [needsCanCreateRooms], (req, res) => {
   updateUsers(room);
 
   res.send({ success: true });
+});
+
+router.post("/displayname", (req, res) => {
+  if (!req.user) res.status(501).send({ error: "Must be logged in" });
+
+  User.findByIdAndUpdate(req.user.id, { displayName: req.body.displayName }, () => {
+    res.send({ success: true });
+  });
 });
 
 // keep the user-to-socket mapping current, so we know who is who

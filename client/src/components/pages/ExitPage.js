@@ -29,10 +29,13 @@ class ExitPage extends Component {
       }
       return (
         <>
-          <h3>Thank you for chatting with {this.state.room.owner}!</h3>
+          <h3>Thank you for chatting with {this.state.room.ownerDisplayName}!</h3>
           <p>
-            If you have further questions, please refer to 
-            <a href={this.state.room.link} target= "_blank" > my website! </a>
+            If you have further questions, please refer to
+            <a href={this.state.room.link} target="_blank">
+              {" "}
+              my website!{" "}
+            </a>
           </p>
           <p> {this.state.room.exitMessage} </p>
           <Button onClick={() => navigate("/")} content="Exit" />
@@ -48,13 +51,16 @@ class ExitPage extends Component {
         <>
           <h2>
             Thank you for hosting a room on Politichat
-            {this.props.user && <>, {this.props.user.username}</>}!
+            {this.props.user?.displayName}!
           </h2>
           <p>
             Please send any questions or feedback to
-            <a href="mailto:politichat@mit.edu"> politichat@mit.edu</a>
+            <a href="mailto:politichat@mit.edu"> politichat@mit.edu</a>!
           </p>
-          <ParticipantList infos={Object.values(this.state.room.userInfos)} roomId={this.state.room.id} />
+          <ParticipantList
+            infos={Object.values(this.state.room.userInfos)}
+            roomId={this.state.room.id}
+          />
           <Button onClick={() => navigate("/")} content="Exit" />
         </>
       );
