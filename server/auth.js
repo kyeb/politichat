@@ -21,7 +21,11 @@ const User = require("./models/user");
 const ALREADY_REGISTERED_ERROR = "username_conflict";
 
 router.get("/logout", (req, res) => {
-  logger.info(`Logged out user ID ${req.user.id}`);
+  if (req.user) {
+    logger.info(`Logged out user ID ${req.user.id}`);
+  } else {
+    logger.info(`Already logged out!`);
+  }
   req.logout();
   res.send({});
 });
