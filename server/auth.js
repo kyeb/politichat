@@ -40,6 +40,8 @@ async function createUser(username, password, displayName) {
     username: username,
     password: hashedSaltedPwd,
     displayName: displayName,
+    admin: false,
+    canCreateRooms: false,
   });
   return newUser.save();
 }

@@ -13,6 +13,7 @@ const socket = require("./server-socket");
 const logger = require("pino")(); // use pino logger
 
 const User = require("./models/user");
+const Room = require("./models/room");
 
 // array to store rooms
 let rooms = [];
@@ -111,17 +112,34 @@ router.post("/newroom", [needsCanCreateRooms], (req, res) => {
     userInfos: {}, // user infos keyed by socketID
   };
 
-  // add room object to array of rooms
-  rooms.push(room_temp);
-
-  // update roomlist on user frontends
-  const allConnected = socket.getAllConnectedSockets();
-  allConnected.forEach((connectedSocket) => {
-    connectedSocket.emit("new room", room_temp);
+  const newRoom = new Room({
+    _id: roomID,
+    roomName: req.body.roomName,
+    owner: req.user.username,
+    ownerDisplayName: req.user.displayName,
+    current: null,
+    queue: [],
+    link: req.body.roomLink,
+    waitMessage: req.body.waitingMessage,
+    exitMessage: req.body.exitMessage,
+    isPrivate: req.body.isPrivate,
+    isScheduled: req.body.isScheduled,
+    startTime: req.body.datetime,
+    userInfos: {}, // user infos keyed by socketID
   });
 
-  // then, send back the entire room object
-  res.send(room_temp);
+  // add room object to array of rooms
+  rooms.push(room_temp);
+  newRoom.save().then((savedRoom) => {
+    // update roomlist on user frontends
+    const allConnected = socket.getAllConnectedSockets();
+    allConnected.forEach((connectedSocket) => {
+      connectedSocket.emit("new room", savedRoom);
+    });
+
+    // then, send back the entire room object
+    res.send(savedRoom);
+  });
 });
 
 router.post("/end", [needsCanCreateRooms], (req, res) => {

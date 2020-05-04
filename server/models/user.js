@@ -11,15 +11,15 @@ var schemaOptions = {
 
 const UserSchema = new mongoose.Schema(
   {
-    username: String,
+    username: { type: String, required: true },
     password: {
       type: String,
       required: true,
       select: false,
     },
-    displayName: String,
-    admin: Boolean,
-    canCreateRooms: Boolean,
+    displayName: { type: String, required: true },
+    admin: { type: Boolean, required: true },
+    canCreateRooms: { type: Boolean, required: true },
   },
   schemaOptions
 );
