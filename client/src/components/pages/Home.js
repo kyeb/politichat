@@ -97,13 +97,13 @@ class Home extends Component {
     const loggedOutLanding = (
       <>
         <div className="twocolumn">
+          {joinRoomForm}
           <AuthController
             logout={this.props.logout}
             loggedIn={this.props.user !== undefined}
             setUser={this.props.setUser}
             providers={["google"]}
           />
-          {joinRoomForm}
         </div>
         <RoomList />
       </>
@@ -123,13 +123,16 @@ class Home extends Component {
       );
     } else {
       newRoomForm = (
-        <Message negative>
-          You do not have permissions to create new rooms yet. <br /> Please email us at{" "}
-          <a href="mailto:politichat@mit.edu?subject=Politichat Beta access request">
-            politichat@mit.edu
-          </a>{" "}
-          for information on how to gain access to our beta.
-        </Message>
+        <div>
+          <h2>Create a new room</h2>
+          <Message negative>
+            You do not have permissions to create new rooms yet. <br /> Please email us at{" "}
+            <a href="mailto:politichat@mit.edu?subject=Politichat Beta access request">
+              politichat@mit.edu
+            </a>{" "}
+            for information on how to gain access to our beta.
+          </Message>
+        </div>
       );
     }
 
