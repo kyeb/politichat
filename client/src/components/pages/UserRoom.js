@@ -150,19 +150,6 @@ class UserRoom extends Component {
         futureMessage = <Message color="orange">This room hasn't begun yet!</Message>;
       }
 
-      let websiteLink = <div />;
-      if (this.props.room.link) {
-        websiteLink = (
-          <p>
-            While you're waiting, check out{" "}
-            <a href={this.props.room.link} target="_blank">
-              {" "}
-              my website!
-            </a>
-          </p>
-        );
-      }
-
       let makeErrorLabel = (error) => {
         if (error) {
           return (
@@ -173,6 +160,107 @@ class UserRoom extends Component {
         }
         return <></>;
       };
+
+      let rightColumn = (
+        <div>
+          <p>Enter your information to stay updated!</p>
+          <Form>
+            <Form.Field className="userroom-info">
+              <Input
+                className="userroom-email"
+                placeholder="Email address"
+                onChange={(event) =>
+                  this.setState({
+                    userInfo: {
+                      ...this.state.userInfo,
+                      email: event.target.value,
+                    },
+                  })
+                }
+                value={this.state.userInfo.email}
+              />
+              {makeErrorLabel(this.state.emailError)}
+            </Form.Field>
+            <Form.Field className="userroom-info">
+              <Input
+                className="userroom-phone"
+                placeholder="Phone Number"
+                onChange={(event) =>
+                  this.setState({
+                    userInfo: {
+                      ...this.state.userInfo,
+                      phone: event.target.value,
+                    },
+                  })
+                }
+                value={this.state.userInfo.phone}
+              />
+              {makeErrorLabel(this.state.phoneError)}
+            </Form.Field>
+            <Form.Field className="userroom-info">
+              <Input
+                className="userroom-town"
+                placeholder="Town"
+                onChange={(event) =>
+                  this.setState({
+                    userInfo: {
+                      ...this.state.userInfo,
+                      town: event.target.value,
+                    },
+                  })
+                }
+                value={this.state.userInfo.town}
+              />
+            </Form.Field>
+            <Form.Button
+              primary
+              className="userroom-infobutton"
+              onClick={this.handleSubmitInfo.bind(this)}
+            >
+              {this.state.infoSubmitted ? "Update" : "Submit"}
+            </Form.Button>
+          </Form>
+        </div>
+      );
+
+      let websiteLink = <div />;
+      if (this.props.room.link) {
+        websiteLink = (
+          <p>
+            While you are waiting, check out{" "}
+            <a href={this.props.room.link} target="_blank">
+              {" " + this.props.room.ownerDisplayName + "'s website"}
+            </a>
+            !
+          </p>
+        );
+      }
+      let waitMessage = <div />;
+      if (this.props.room.waitMessage) {
+        waitMessage = (
+          <div>
+            <p className="waitMessageHeader">
+              Below is a message from {this.props.room.ownerDisplayName}:
+            </p>
+            <Divider hidden />
+            <p className="waitMessage">
+              {this.props.room.waitMessage}
+            </p>
+          </div>
+        );
+      }
+      let leftColumn = (
+        <div className="UserRoom-customcontent">
+          {websiteLink}
+          {this.props.room.link && this.props.room.waitMessage ?
+            <Divider hidden /> : <></>}
+          {waitMessage}
+        </div>
+      );
+      if (!this.props.room.link && !this.props.room.waitMessage) {
+        leftColumn = rightColumn;
+        rightColumn = <div />;
+      }
 
       return (
         <>
@@ -185,71 +273,12 @@ class UserRoom extends Component {
             content="Leave queue"
             floated="right"
           />
-          <p>Waiting in line to speak to {this.props.room.ownerDisplayName}...</p>
+          <h3>Waiting in line to speak to {this.props.room.ownerDisplayName}...</h3>
           {this.state.position && <p>You are position {this.state.position} in line.</p>}
-          <Divider />
+          <Divider section />
           <div className="twocolumn">
-            <div className="UserRoom-customcontent">
-              {websiteLink}
-              <p> {this.props.room.waitMessage} </p>
-            </div>
-            <Form>
-              <p>Enter your information to stay updated!</p>
-              <Form.Field className="userroom-info">
-                <Input
-                  className="userroom-email"
-                  placeholder="Email address"
-                  onChange={(event) =>
-                    this.setState({
-                      userInfo: {
-                        ...this.state.userInfo,
-                        email: event.target.value,
-                      },
-                    })
-                  }
-                  value={this.state.userInfo.email}
-                />
-                {makeErrorLabel(this.state.emailError)}
-              </Form.Field>
-              <Form.Field className="userroom-info">
-                <Input
-                  className="userroom-phone"
-                  placeholder="Phone Number"
-                  onChange={(event) =>
-                    this.setState({
-                      userInfo: {
-                        ...this.state.userInfo,
-                        phone: event.target.value,
-                      },
-                    })
-                  }
-                  value={this.state.userInfo.phone}
-                />
-                {makeErrorLabel(this.state.phoneError)}
-              </Form.Field>
-              <Form.Field className="userroom-info">
-                <Input
-                  className="userroom-town"
-                  placeholder="Town"
-                  onChange={(event) =>
-                    this.setState({
-                      userInfo: {
-                        ...this.state.userInfo,
-                        town: event.target.value,
-                      },
-                    })
-                  }
-                  value={this.state.userInfo.town}
-                />
-              </Form.Field>
-              <Form.Button
-                primary
-                className="userroom-infobutton"
-                onClick={this.handleSubmitInfo.bind(this)}
-              >
-                {this.state.infoSubmitted ? "Update" : "Submit"}
-              </Form.Button>
-            </Form>
+            {leftColumn}
+            {rightColumn}
           </div>
         </>
       );

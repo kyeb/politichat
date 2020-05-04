@@ -34,8 +34,9 @@ class ExitPage extends Component {
           <p>
             If you have further questions, please refer to
             <a href={this.state.room.link} target="_blank">
-              {" " + this.state.room.ownerDisplayName + "'s website!"}
+              {" " + this.state.room.ownerDisplayName + "'s website"}
             </a>
+            !
           </p>
         );
       }

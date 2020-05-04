@@ -46,6 +46,15 @@ header {
   grid-template-columns: 1fr 1fr;
 }
 
+.waitMessageHeader {
+  font-style: italic;
+}
+
+.waitMessage {
+  margin-left: 1em;
+  white-space: pre-wrap;
+}
+
 footer {
   position: absolute;
   bottom: 10px;
