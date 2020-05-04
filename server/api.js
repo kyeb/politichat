@@ -77,10 +77,18 @@ router.post("/newroom", [needsCanCreateRooms], (req, res) => {
     return;
   }
 
-  // error if link is not valid
-  if (req.body.roomLink && validURL(req.body.roomLink) === false) {
-    res.status(400).send({ statusMessage: "URL not valid" });
-    return;
+  let prefix = "";
+  if (req.body.roomLink) {
+    // error if link is not valid
+    if (validURL(req.body.roomLink) === false) {
+      res.status(400).send({ statusMessage: "URL not valid" });
+      return;
+    }
+
+    // add https:// if not there already
+    if (!req.body.roomLink.startsWith("http://") && !req.body.roomLink.startsWith("https://")) {
+      prefix = "https://";
+    }
   }
 
   // generate random room ID number
@@ -94,7 +102,7 @@ router.post("/newroom", [needsCanCreateRooms], (req, res) => {
     ownerDisplayName: req.user.displayName,
     current: null,
     queue: [],
-    link: req.body.roomLink,
+    link: prefix + req.body.roomLink,
     waitMessage: req.body.waitingMessage,
     exitMessage: req.body.exitMessage,
     isPrivate: req.body.isPrivate,
