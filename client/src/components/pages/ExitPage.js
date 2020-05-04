@@ -27,16 +27,23 @@ class ExitPage extends Component {
       if (!this.state.room) {
         return <Loader active />;
       }
-      return (
-        <>
-          <h3>Thank you for chatting with {this.state.room.ownerDisplayName}!</h3>
+
+      let websiteRef = <></>;
+      if (this.state.room.link) {
+        websiteRef = (
           <p>
             If you have further questions, please refer to
             <a href={this.state.room.link} target="_blank">
-              {" "}
-              my website!{" "}
+              {" " + this.state.room.ownerDisplayName + "'s website!"}
             </a>
           </p>
+        );
+      }
+
+      return (
+        <>
+          <h3>Thank you for chatting with {this.state.room.ownerDisplayName}!</h3>
+          {websiteRef}
           <p> {this.state.room.exitMessage} </p>
           <Button onClick={() => navigate("/")} content="Exit" />
         </>
