@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import ParticipantList from "../modules/ParticipantList";
-import { Loader, Button, Message } from "semantic-ui-react";
+import { Divider, Loader, Button, Message } from "semantic-ui-react";
 import { get, error } from "../../utilities";
 import { navigate } from "@reach/router";
 
@@ -64,10 +64,12 @@ class ExitPage extends Component {
             Please send any questions or feedback to
             <a href="mailto:politichat@mit.edu"> politichat@mit.edu</a>!
           </p>
+          <Divider />
           <ParticipantList
             infos={Object.values(this.state.room.userInfos)}
             roomId={this.state.room.id}
           />
+          <Divider />
           <Button onClick={() => navigate("/")} content="Exit" />
         </>
       );

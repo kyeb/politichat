@@ -38,8 +38,13 @@ class ParticipantList extends Component {
       <>
         <h3>Participant information</h3>
 
-        Download information as a
-        <CSVLink data={csvData} filename={this.props.roomId + "_participantinfo.csv"}> csv file</CSVLink>
+        <CSVLink
+          data={csvData}
+          className="ui button primary"
+          filename={this.props.roomId + "_participantinfo.csv"}
+        >
+          Download as CSV
+        </CSVLink>
 
         <Table celled columns={4}>
           <Table.Header>
