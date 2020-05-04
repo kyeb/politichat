@@ -136,6 +136,7 @@ class UserRoom extends Component {
               className="userroom-namebutton"
               onClick={this.handleJoinQueue}
               type="button"
+              disabled={this.state.userInfo.name.length === 0}
             >
               Join Queue
             </Form.Button>
