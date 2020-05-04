@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Table, Message, Divider } from "semantic-ui-react";
+import { Table, Message, Divider, Loader } from "semantic-ui-react";
 import { get } from "../../utilities";
 import UserRow from "../modules/UserRow.js";
 import RoomRow from "../modules/RoomRow";
@@ -14,6 +14,10 @@ class AdminPanel extends Component {
     };
   }
 
+  load() {
+    this.setState({ loaded: true });
+  }
+
   componentDidMount() {
     get("/api/users").then((users) => {
       this.setState({ users });
@@ -21,9 +25,20 @@ class AdminPanel extends Component {
     get("/api/rooms").then((rooms) => {
       this.setState({ rooms });
     });
+    this.timeout = setTimeout(this.load.bind(this), 500);
+  }
+
+  componentwillunmount() {
+    if (this.timeout) {
+      cleartimeout(this.timeout);
+    }
   }
 
   render() {
+    if (!this.props.user && !this.state.loaded) {
+      return <Loader active />;
+    }
+
     var adminPanel = (
       <>
         <h2>Settings</h2>

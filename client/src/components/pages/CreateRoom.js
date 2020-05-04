@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Form, Message } from "semantic-ui-react";
+import { Form, Loader, Message } from "semantic-ui-react";
 import { DateTimeInput } from "semantic-ui-calendar-react";
 import { post } from "../../utilities";
 import { navigate } from "@reach/router";
@@ -57,7 +57,47 @@ class CreateRoom extends Component {
     });
   };
 
+  load() {
+    this.setState({ loaded: true });
+  }
+
+  componentDidMount() {
+    this.timeout = setTimeout(this.load.bind(this), 500);
+  }
+
+  componentWillUnmount() {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
+  }
+
   render() {
+    if (!this.props.user && !this.state.loaded) {
+      return <Loader active />;
+    }
+
+    if (!this.props.user) {
+      return (
+        <div>
+          <h2>Create a new room</h2>
+          <Message negative>You must be logged in to view this page.</Message>
+        </div>
+      );
+    } else if (!this.props.user.canCreateRooms) {
+      return (
+        <div>
+          <h2>Create a new room</h2>
+          <Message negative>
+            You do not have permissions to create new rooms yet. <br /> Please email us at{" "}
+            <a href="mailto:politichat@mit.edu?subject=Politichat Beta access request">
+              politichat@mit.edu
+            </a>{" "}
+            for information on how to gain access to our beta.
+          </Message>
+        </div>
+      );
+    }
+
     let roomNameInput = (
       <Form.Input
         className="newroom-name"
