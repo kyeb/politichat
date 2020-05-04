@@ -104,7 +104,7 @@ class App extends Component {
           <NotFound default />
         </Router>
         <footer>
-          <p className="footer-content">Made by Sabrina and Kye for CS91r</p>
+          <p className="footer-content">Made by Sabrina, Kye, and Daniel for CS91r</p>
         </footer>
       </div>
     );
