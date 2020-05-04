@@ -46,11 +46,11 @@ header {
   grid-template-columns: 1fr 1fr;
 }
 
-.waitMessageHeader {
+.ownerMessageHeader {
   font-style: italic;
 }
 
-.waitMessage {
+.ownerMessage {
   margin-left: 1em;
   white-space: pre-wrap;
 }

@@ -240,11 +240,11 @@ class UserRoom extends Component {
       if (this.props.room.waitMessage) {
         waitMessage = (
           <div>
-            <p className="waitMessageHeader">
+            <p className="ownerMessageHeader">
               Below is a message from {this.props.room.ownerDisplayName}:
             </p>
             <Divider hidden />
-            <p className="waitMessage">
+            <p className="ownerMessage">
               {this.props.room.waitMessage}
             </p>
           </div>

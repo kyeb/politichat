@@ -41,11 +41,27 @@ class ExitPage extends Component {
         );
       }
 
+      let exitMessage = <div />;
+      if (this.state.room.exitMessage) {
+        exitMessage = (
+          <div>
+            <p className="ownerMessageHeader">
+              Below is a message from {this.state.room.ownerDisplayName}:
+            </p>
+            <Divider hidden />
+            <p className="ownerMessage">
+              {this.state.room.exitMessage}
+            </p>
+            <Divider hidden />
+          </div>
+        );
+      }
+
       return (
         <>
           <h3>Thank you for chatting with {this.state.room.ownerDisplayName}!</h3>
           {websiteRef}
-          <p> {this.state.room.exitMessage} </p>
+          {exitMessage}
           <Button onClick={() => navigate("/")} content="Exit" />
         </>
       );
