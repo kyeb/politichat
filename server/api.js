@@ -15,10 +15,6 @@ const logger = require("pino")(); // use pino logger
 const User = require("./models/user");
 const Room = require("./models/room");
 
-// array to store rooms
-let rooms = [];
-let endedRooms = [];
-
 // api endpoints: all these paths will be prefixed with "/api/"
 const router = express.Router();
 
@@ -61,147 +57,116 @@ function validURL(str) {
 
 router.post("/newroom", [needsCanCreateRooms], (req, res) => {
   // error if room with same name already exists
-  if (rooms.find((room) => room.roomName === req.body.roomName)) {
-    res.status(400).send({ msg: "Room with that name already exists" });
-    return;
-  }
-
-  // error if room name includes quotation marks
-  if (isValid(req.body.roomName) === false) {
-    res.status(400).send({ statusMessage: "Room name cannot include special characters" });
-    return;
-  }
-
-  // error if room name is empty
-  if (req.body.roomName === "") {
-    res.status(400).send({ statusMessage: "Room name cannot be empty" });
-    return;
-  }
-
-  let prefix = "";
-  if (req.body.roomLink) {
-    // error if link is not valid
-    if (validURL(req.body.roomLink) === false) {
-      res.status(400).send({ statusMessage: "URL not valid" });
+  Room.findOne({ _id: req.body.id }).then((duplicate) => {
+    if (duplicate) {
+      res.status(400).send({ msg: "Room with that name already exists" });
       return;
     }
 
-    // add https:// if not there already
-    if (!req.body.roomLink.startsWith("http://") && !req.body.roomLink.startsWith("https://")) {
-      prefix = "https://";
+    // error if room name includes quotation marks
+    if (isValid(req.body.roomName) === false) {
+      res.status(400).send({ statusMessage: "Room name cannot include special characters" });
+      return;
     }
-  }
 
-  // generate random room ID number
-  const roomID = Math.random().toString(36).substr(2, 9);
+    // error if room name is empty
+    if (req.body.roomName === "") {
+      res.status(400).send({ statusMessage: "Room name cannot be empty" });
+      return;
+    }
 
-  // make a room object with keys id, roomName, owner, current user, and queue
-  const room_temp = {
-    id: roomID,
-    roomName: req.body.roomName,
-    owner: req.user.username,
-    ownerDisplayName: req.user.displayName,
-    current: null,
-    queue: [],
-    link: prefix + req.body.roomLink,
-    waitMessage: req.body.waitingMessage,
-    exitMessage: req.body.exitMessage,
-    isPrivate: req.body.isPrivate,
-    isScheduled: req.body.isScheduled,
-    datetime: req.body.datetime,
-    userInfos: {}, // user infos keyed by socketID
-  };
+    let prefix = "";
+    if (req.body.roomLink) {
+      // error if link is not valid
+      if (validURL(req.body.roomLink) === false) {
+        res.status(400).send({ statusMessage: "URL not valid" });
+        return;
+      }
 
-  const newRoom = new Room({
-    _id: roomID,
-    roomName: req.body.roomName,
-    owner: req.user.username,
-    ownerDisplayName: req.user.displayName,
-    current: null,
-    queue: [],
-    link: req.body.roomLink,
-    waitMessage: req.body.waitingMessage,
-    exitMessage: req.body.exitMessage,
-    isPrivate: req.body.isPrivate,
-    isScheduled: req.body.isScheduled,
-    startTime: req.body.datetime,
-    userInfos: {}, // user infos keyed by socketID
-  });
+      // add https:// if not there already
+      if (!req.body.roomLink.startsWith("http://") && !req.body.roomLink.startsWith("https://")) {
+        prefix = "https://";
+      }
+    }
 
-  // add room object to array of rooms
-  rooms.push(room_temp);
-  newRoom.save().then((savedRoom) => {
-    // update roomlist on user frontends
-    const allConnected = socket.getAllConnectedSockets();
-    allConnected.forEach((connectedSocket) => {
-      connectedSocket.emit("new room", savedRoom);
+    // generate random room ID number
+    const roomID = Math.random().toString(36).substr(2, 9);
+
+    const newRoom = new Room({
+      id: roomID,
+      roomName: req.body.roomName,
+      owner: req.user.username,
+      ownerDisplayName: req.user.displayName,
+      link: req.body.roomLink,
+      waitMessage: req.body.waitingMessage,
+      exitMessage: req.body.exitMessage,
+      isPrivate: req.body.isPrivate,
+      isScheduled: req.body.isScheduled,
+      startTime: req.body.datetime,
+      userInfos: {}, // user infos keyed by socketID
     });
 
-    // then, send back the entire room object
-    res.send(savedRoom);
+    // add room object to array of rooms
+    newRoom.save().then((savedRoom) => {
+      // update roomlist on user frontends
+      const allConnected = socket.getAllConnectedSockets();
+      allConnected.forEach((connectedSocket) => {
+        connectedSocket.emit("new room", savedRoom);
+      });
+
+      // then, send back the entire room object
+      res.send(savedRoom);
+    });
   });
 });
 
 router.post("/end", [needsCanCreateRooms], (req, res) => {
-  const room = rooms.find((e) => e.id === req.body.id);
-
-  // tell the old user that they should exit the page
-  const userSocket = socket.getSocketFromSocketID(room.current);
-  if (userSocket) {
-    userSocket.emit("room gone");
-  }
-
-  // tell all users in queue to exit the page
-  for (let i = 0; i < room.queue.length; i++) {
-    const queuedSocket = socket.getSocketFromSocketID(room.queue[i]);
-    if (queuedSocket) {
-      // TODO: make this a different message so queued users see a message instead of just
-      //   being kicked from the queue
-      queuedSocket.emit("room gone");
+  Room.findOne({ _id: req.body.id }).then((room) => {
+    // tell the old user that they should exit the page
+    const userSocket = socket.getSocketFromSocketID(room.current);
+    if (userSocket) {
+      userSocket.emit("room gone");
     }
-  }
 
-  // add the room to ended rooms for exit pages
-  endedRooms.push(room);
+    // tell all users in queue to exit the page
+    for (let i = 0; i < room.queue.length; i++) {
+      const queuedSocket = socket.getSocketFromSocketID(room.queue[i]);
+      if (queuedSocket) {
+        // TODO: make this a different message so queued users see a message instead of just
+        //   being kicked from the queue
+        queuedSocket.emit("room gone");
+      }
+    }
 
-  // delete a room by its ID from the array of active rooms
-  const length = rooms.length;
-  rooms = rooms.filter(function (e) {
-    return e.id !== req.body.id;
+    // specify that the room is ended
+    room.ended = true;
+
+    // update roomlist on user frontends
+    const allConnected = socket.getAllConnectedSockets();
+    allConnected.forEach((connectedSocket) => {
+      connectedSocket.emit("room ended", room);
+    });
+
+    room.save().then(() => {
+      // send true if we successfully saved
+      res.send({ success: true });
+    });
   });
-
-  // sends true if was successful, false if not
-  if (rooms.length == length) {
-    res.send({ success: false });
-  }
-
-  // update roomlist on user frontends
-  const allConnected = socket.getAllConnectedSockets();
-  allConnected.forEach((connectedSocket) => {
-    connectedSocket.emit("room ended", room);
-  });
-
-  res.send({ success: true });
 });
 
 router.get("/rooms", (req, res) => {
   // returns all available rooms with id and roomName in an array
-  res.send(rooms);
+  Room.find({ ended: false }).then((rooms) => {
+    res.send(rooms);
+  });
 });
 
 router.get("/room", (req, res) => {
   // returns just the room with a specific requested ID
   // each room should have the id and roomName so far
-  res.send(rooms.find((e) => e.id === req.query.id));
-});
-
-router.get("/endedroom", (req, res) => {
-  // returns possibly ended room with a specific requested ID
-  const room = rooms.find((e) => e.id === req.query.id);
-  if (!room) {
-    res.send(endedRooms.find((e) => e.id === req.query.id));
-  }
-  res.send(room);
+  Room.findOne({ _id: req.query.id }).then((room) => {
+    res.send(room);
+  });
 });
 
 router.post("/leavequeue", (req, res) => {
@@ -210,13 +175,17 @@ router.post("/leavequeue", (req, res) => {
 });
 
 function removeFromQueue(roomID, userSocketID) {
-  const room = rooms.find((e) => e.id === roomID);
-  // if the room doesn't exist for some reason, exit
-  if (!room) return;
-  room.queue = room.queue.filter((e) => e !== userSocketID);
-  logger.info(`User ${userSocketID} has left the queue`);
-  updateHost(room);
-  updateUsers(room);
+  // const room = rooms.find((e) => e.id === roomID);
+  Room.findOne({ _id: roomID }).then((room) => {
+    // if the room doesn't exist for some reason, exit
+    if (!room) return;
+    room.queue = room.queue.filter((e) => e !== userSocketID);
+    room.save().then((savedRoom) => {
+      logger.info(`User ${userSocketID} has left the queue`);
+      updateHost(savedRoom);
+      updateUsers(savedRoom);
+    });
+  });
 }
 
 function updateHost(room) {
@@ -238,91 +207,126 @@ function updateUsers(room) {
 router.post("/join", (req, res) => {
   // adds a user's socketID to the queue for the given room
   const userSocket = socket.getSocketFromSocketID(req.body.socketID);
-  const room = rooms.find((e) => e.id === req.body.roomID);
-  if (!room) {
-    res.status(404).send({});
-    return;
-  }
+  Room.findOne({ _id: req.body.roomID }).then((room) => {
+    if (!room) {
+      res.status(500).send({ msg: "Room not found" });
+      return;
+    }
 
-  // if the host is trying to join, don't let them
-  if (userSocket === socket.getSocketFromUsername(room.owner)) {
-    updateHost(room);
-    res.send({});
-    return;
-  }
+    // if the host is trying to join, don't let them
+    if (userSocket === socket.getSocketFromUsername(room.owner)) {
+      updateHost(room);
+      res.send({});
+      return;
+    }
 
-  room.queue.push(userSocket.id);
-  logger.info(`User ${userSocket.id} has joined the queue`);
+    Room.findByIdAndUpdate(
+      req.body.roomID,
+      { $push: { queue: userSocket.id } },
+      { new: true }
+    ).then((updatedRoom) => {
+      logger.info(`User ${userSocket.id} has joined the queue`);
+      logger.info(`Updated queue: ${updatedRoom.queue}`);
 
-  // add the name to the userInfos (later populated with email, etc.)
-  room.userInfos[req.body.socketID] = {
-    name: req.body.name,
-  };
+      // set up a callback so that if the user disconnects, they get removed from
+      //   the queue
+      userSocket.on("disconnect", () => {
+        removeFromQueue(updatedRoom._id, userSocket.id);
+      });
 
-  // set up a callback so that if the user disconnects, they get removed from
-  //   the queue
-  userSocket.on("disconnect", () => {
-    removeFromQueue(room.id, userSocket.id);
+      // tell the room owner how many people are in the queue
+      updateHost(updatedRoom);
+      updateUsers(updatedRoom);
+
+      // add the name to the userInfos (later populated with email, etc.)
+      updatedRoom.userInfos.set(req.body.socketID, {
+        name: req.body.name,
+      });
+      updatedRoom.save().then(() => {
+        res.send({ success: true });
+      });
+    });
   });
-
-  // tell the room owner how many people are in the queue
-  updateHost(room);
-  updateUsers(room);
-
-  res.send({ success: true });
 });
 
 router.post("/submitInfo", (req, res) => {
   // add/update a user's info
-  const room = rooms.find((e) => e.id === req.body.roomID);
-  if (!room) {
-    res.status(404).send({});
-    return;
-  }
+  Room.findOne({ _id: req.body.roomID }).then((room) => {
+    if (!room) {
+      res.status(404).send({});
+      return;
+    }
 
-  // ensure is valid email
-  let emailOkay = !req.body.userInfo.email || /\S+@\S+\.\S+/.test(req.body.userInfo.email);
-  let phoneOkay = !req.body.userInfo.phone || /[\d()\- ]+/.test(req.body.userInfo.phone);
-  if (emailOkay && phoneOkay) {
-    room.userInfos[req.body.socketID] = req.body.userInfo;
-    res.send({ success: true });
-  } else {
-    res.status(400).send({});
-  }
+    // ensure is valid email
+    let emailOkay = !req.body.userInfo.email || /\S+@\S+\.\S+/.test(req.body.userInfo.email);
+    let phoneOkay = !req.body.userInfo.phone || /[\d()\- ]+/.test(req.body.userInfo.phone);
+    if (emailOkay && phoneOkay) {
+      room.userInfos.set(req.body.socketID, req.body.userInfo);
+      room.save().then(() => {
+        res.send({ success: true });
+      });
+    } else {
+      res.status(400).send({});
+    }
+  });
 });
 
 router.post("/next", [needsCanCreateRooms], (req, res) => {
-  const room = rooms.find((e) => e.id === req.body.id);
-  // ensure logged in as owner
-  if (req.user && room.owner !== req.user.username) {
-    res.status(401).send({});
-    return;
-  }
+  Room.findOne({ _id: req.body.id }).then((room) => {
+    // ensure logged in as owner
+    if (req.user && room.owner !== req.user.username) {
+      res.status(401).send({});
+      return;
+    }
 
-  // fail if nobody in queue; the "next" button should be disabled in frontend until someone is
-  //   there, so this shouldn't be happen
-  if (room.queue.length === 0) {
-    res.send({ success: false });
-    return;
-  }
+    // fail if nobody in queue; the "next" button should be disabled in frontend until someone is
+    //   there, so this shouldn't be happen
+    if (room.queue.length === 0) {
+      res.send({ success: false });
+      return;
+    }
 
-  if (room.current && socket.getSocketFromSocketID(room.current)) {
-    // tell the old user that they should exit the page
-    socket.getSocketFromSocketID(room.current).emit("leave please");
-  }
+    if (room.current && socket.getSocketFromSocketID(room.current)) {
+      // tell the old user that they should exit the page
+      socket.getSocketFromSocketID(room.current).emit("leave please");
+    }
 
-  room.current = room.queue[0]; // first element is the who to currently connect
+    let current;
+    while (!current || !socket.getSocketFromSocketID(current)) {
+      if (room.queue.length === 0) {
+        updateHost(room);
+        updateUsers(room);
+        res.send({ success: true });
+        return;
+      }
+      current = room.queue.shift(); // grab and remove first user from array
+    }
+    room.current = current;
 
-  room.queue.shift(); // remove the old user from the array
+    // tell the first user in the queue they can connect
+    socket.getSocketFromSocketID(room.current).emit("host ready");
 
-  // tell the first user in the queue they can connect
-  socket.getSocketFromSocketID(room.current).emit("host ready");
+    // let the host know the queue length again, so they can update it
+    updateHost(room);
+    updateUsers(room);
 
-  // let the host know the queue length again, so they can update it
-  updateHost(room);
-  updateUsers(room);
+    room.save().then(() => {
+      res.send({ success: true });
+    });
+  });
+});
 
-  res.send({ success: true });
+router.get("/totalrooms", [needsAdmin], (req, res) => {
+  Room.count({}).then((count) => {
+    res.send({ roomCount: count });
+  });
+});
+
+router.post("/cleanended", [needsAdmin], (req, res) => {
+  Room.deleteMany({ ended: true }).then(() => {
+    logger.info("Cleared all ended rooms.");
+    res.send({ success: true });
+  });
 });
 
 router.post("/displayname", (req, res) => {

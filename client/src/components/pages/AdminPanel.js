@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { Table, Message, Divider, Loader } from "semantic-ui-react";
-import { get } from "../../utilities";
+import { Table, Message, Divider, Loader, Button, Label } from "semantic-ui-react";
+import { get, post } from "../../utilities";
 import UserRow from "../modules/UserRow.js";
 import RoomRow from "../modules/RoomRow";
 
@@ -8,9 +8,9 @@ class AdminPanel extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // These arrays are not kept in sync with changes visually on the page or on the server.
       users: [],
       rooms: [],
+      roomCount: null,
     };
   }
 
@@ -18,13 +18,18 @@ class AdminPanel extends Component {
     this.setState({ loaded: true });
   }
 
+  handleClearEnded = () => {
+    post("/api/cleanended").then((res) => {
+      if (res.success) {
+        window.location.reload(false);
+      }
+    });
+  };
+
   componentDidMount() {
-    get("/api/users").then((users) => {
-      this.setState({ users });
-    });
-    get("/api/rooms").then((rooms) => {
-      this.setState({ rooms });
-    });
+    get("/api/users").then((users) => this.setState({ users }));
+    get("/api/rooms").then((rooms) => this.setState({ rooms }));
+    get("/api/totalrooms").then((roomCount) => this.setState(roomCount));
     this.timeout = setTimeout(this.load.bind(this), 500);
   }
 
@@ -39,9 +44,24 @@ class AdminPanel extends Component {
       return <Loader active />;
     }
 
+    let cleanUpOptions;
+    if (this.state.roomCount) {
+      cleanUpOptions = (
+        <>
+          <Button negative floated="right" onClick={this.handleClearEnded}>
+            Delete all ended rooms
+          </Button>
+          <Label>
+            Total rooms in database: <Label.Detail>{this.state.roomCount}</Label.Detail>
+          </Label>
+        </>
+      );
+    }
+
     var adminPanel = (
       <>
         <h2>Settings</h2>
+        {cleanUpOptions}
         <Divider />
         <h2>Users</h2>
         <Table>

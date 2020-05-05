@@ -14,7 +14,7 @@ class ExitPage extends Component {
 
   componentDidMount() {
     if (this.props.roomId !== "null") {
-      get("/api/endedroom", { id: this.props.roomId })
+      get("/api/room", { id: this.props.roomId })
         .then((room) => {
           this.setState({ room });
         })
@@ -49,9 +49,7 @@ class ExitPage extends Component {
               Below is a message from {this.state.room.ownerDisplayName}:
             </p>
             <Divider hidden />
-            <p className="ownerMessage">
-              {this.state.room.exitMessage}
-            </p>
+            <p className="ownerMessage">{this.state.room.exitMessage}</p>
             <Divider hidden />
           </div>
         );
