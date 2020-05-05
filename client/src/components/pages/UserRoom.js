@@ -244,17 +244,14 @@ class UserRoom extends Component {
               Below is a message from {this.props.room.ownerDisplayName}:
             </p>
             <Divider hidden />
-            <p className="ownerMessage">
-              {this.props.room.waitMessage}
-            </p>
+            <p className="ownerMessage">{this.props.room.waitMessage}</p>
           </div>
         );
       }
       let leftColumn = (
         <div className="UserRoom-customcontent">
           {websiteLink}
-          {this.props.room.link && this.props.room.waitMessage ?
-            <Divider hidden /> : <></>}
+          {this.props.room.link && this.props.room.waitMessage ? <Divider hidden /> : <></>}
           {waitMessage}
         </div>
       );
