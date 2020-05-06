@@ -102,7 +102,7 @@ router.post("/newroom", [needsCanCreateRooms], (req, res) => {
       exitMessage: req.body.exitMessage,
       isPrivate: req.body.isPrivate,
       isScheduled: req.body.isScheduled,
-      startTime: req.body.datetime,
+      datetime: req.body.datetime,
       userInfos: {}, // user infos keyed by socketID
     });
 

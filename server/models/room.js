@@ -22,7 +22,7 @@ const RoomSchema = new mongoose.Schema(
     exitMessage: { type: String, required: false },
     isPrivate: { type: Boolean, required: true },
     isScheduled: { type: Boolean, required: true },
-    startTime: Date,
+    datetime: Number,
     ended: { type: Boolean, default: false },
     userInfos: Map,
   },
