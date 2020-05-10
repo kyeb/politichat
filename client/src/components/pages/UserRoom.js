@@ -12,7 +12,6 @@ class UserRoom extends Component {
     this.state = {
       emailError: "",
       phoneError: "",
-      infoSubmitted: false,
       InQueue: false,
       position: null,
       userInfo: {
@@ -73,83 +72,37 @@ class UserRoom extends Component {
   }
 
   handleJoinQueue = () => {
-    post("/api/join", {
-      roomID: this.props.room.id,
-      socketID: socket.id,
-      name: this.state.userInfo.name,
-    })
-      .then(() => {})
-      .catch((err) => error(err, "Joining room failed"));
-    this.setState({ joinedQueue: true });
-  };
-
-  handleSubmitInfo() {
     let emailOkay = !this.state.userInfo.email || /\S+@\S+\.\S+/.test(this.state.userInfo.email);
-    let phoneOkay = !this.state.userInfo.phone || /[\d()\- ]+/.test(this.state.userInfo.phone);
+    let phoneOkay = !this.state.userInfo.phone || /^\d{10}$/.test(this.state.userInfo.phone);
 
     if (emailOkay && phoneOkay) {
       this.setState({
-        infoSubmitted: true,
         emailError: "",
         phoneError: "",
       });
 
-      post("/api/submitInfo", {
+      post("/api/join", {
         roomID: this.props.room.id,
         socketID: socket.id,
-        userInfo: this.state.userInfo,
+        name: this.state.userInfo.name,
+        email: this.state.userInfo.email, 
+        phone: this.state.userInfo.phone, 
+        town: this.state.userInfo.town
       })
-        .then(() => {})
-        .catch((err) => error(err, "Submitting information failed"));
+        .then(() => {
+        })
+        .catch((err) => error(err, "Joining room failed"));
+      this.setState({ joinedQueue: true });
     } else {
       this.setState({
         emailError: emailOkay ? "" : "Enter a valid email address",
         phoneError: phoneOkay ? "" : "Enter a valid phone number",
       });
     }
-  }
+  };
 
   render() {
     if (!this.state.joinedQueue) {
-      return (
-        <>
-          <p>
-            Enter your name below to join the queue to speak with {this.props.room.ownerDisplayName}
-            !
-          </p>
-          <Form onSubmit={this.handleJoinQueue}>
-            <Form.Input
-              className="userroom-name"
-              placeholder="Enter your name"
-              onChange={(event) =>
-                this.setState({
-                  userInfo: {
-                    ...this.state.userInfo,
-                    name: event.target.value,
-                  },
-                })
-              }
-              value={this.state.userInfo.name}
-            />
-            <Form.Button
-              primary
-              className="userroom-namebutton"
-              onClick={this.handleJoinQueue}
-              type="button"
-              disabled={this.state.userInfo.name.length === 0}
-            >
-              Join Queue
-            </Form.Button>
-          </Form>
-        </>
-      );
-    }
-
-    if (!this.state.inCall) {
-      let futureMessage = <></>;
-      if (this.state.isFuture) {
-        futureMessage = <Message color="orange">This room hasn't begun yet!</Message>;
-      }
 
       let makeErrorLabel = (error) => {
         if (error) {
@@ -162,10 +115,28 @@ class UserRoom extends Component {
         return <></>;
       };
 
-      let rightColumn = (
-        <div>
-          <p>Enter your information to stay updated!</p>
+      return (
+        <>
+          <p>
+            Enter your information below to join the queue to speak with {this.props.room.ownerDisplayName}
+            !
+          </p>    
           <Form>
+            <Form.Field className="userroom-info">
+              <Input
+                className="userroom-name"
+                placeholder="First and Last Name"
+                onChange={(event) =>
+                  this.setState({
+                    userInfo: {
+                      ...this.state.userInfo,
+                      name: event.target.value,
+                    },
+                  })
+                }
+                value={this.state.userInfo.name}
+              />
+            </Form.Field>
             <Form.Field className="userroom-info">
               <Input
                 className="userroom-email"
@@ -213,14 +184,37 @@ class UserRoom extends Component {
                 value={this.state.userInfo.town}
               />
             </Form.Field>
-            <Form.Button
+            {/* <Form.Button
               primary
               className="userroom-infobutton"
               onClick={this.handleSubmitInfo.bind(this)}
+              disabled={this.state.userInfo.name === "" || this.state.userInfo.email === "" || this.state.userInfo.town === ""}
             >
               {this.state.infoSubmitted ? "Update" : "Submit"}
+            </Form.Button> */}
+            <Form.Button
+              primary
+              className="userroom-infobutton"
+              onClick={this.handleJoinQueue}
+              type="button"
+              disabled={this.state.userInfo.name === "" || this.state.userInfo.email === "" || this.state.userInfo.town === ""}
+            >
+              Join Queue
             </Form.Button>
           </Form>
+        </>
+      );
+    }
+
+    if (!this.state.inCall) {
+      let futureMessage = <></>;
+      if (this.state.isFuture) {
+        futureMessage = <Message color="orange">This room hasn't begun yet!</Message>;
+      }
+
+      let rightColumn = (
+        <div>
+          <p>Enter your information to stay updated!</p>
         </div>
       );
 
@@ -272,7 +266,7 @@ class UserRoom extends Component {
             floated="right"
           />
           <h3>Waiting in line to speak to {this.props.room.ownerDisplayName}...</h3>
-          {this.state.position && <p>You are position {this.state.position} in line.</p>}
+          {this.props.room.ownerDisplayName && <p>{this.props.room.ownerDisplayName} is currently speaking with constituents, but looks forward to speaking with you soon!</p>}
           <Divider section />
           <div className="twocolumn">
             {leftColumn}

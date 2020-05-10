@@ -182,17 +182,31 @@ function removeFromQueue(roomID, userSocketID) {
     room.queue = room.queue.filter((e) => e !== userSocketID);
     room.save().then((savedRoom) => {
       logger.info(`User ${userSocketID} has left the queue`);
-      updateHost(savedRoom);
+      updateQueueLength(savedRoom);
+      updateQueueArray(savedRoom);
       updateUsers(savedRoom);
     });
   });
 }
 
-function updateHost(room) {
+function updateQueueLength(room) {
   const ownerSocket = socket.getSocketFromUsername(room.owner);
   if (ownerSocket) {
     ownerSocket.emit("queue status", room.queue.length);
   }
+}
+
+function updateQueueArray(room){
+  const ownerSocket = socket.getSocketFromUsername(room.owner);
+  let queue_info =  [];
+    for (let i = 0; i < room.queue.length; i++) {
+      current_id = room.queue[i]; 
+      queue_info[i] = {
+        name: room.userInfos.get(current_id).name, 
+        town: room.userInfos.get(current_id).town
+      }
+    }
+  ownerSocket.emit("queue array", queue_info)
 }
 
 function updateUsers(room) {
@@ -203,6 +217,20 @@ function updateUsers(room) {
     }
   }
 }
+
+// router.post("/usersinqueue", (req, res) => {
+//   Room.findOne({ _id: req.body.id }).then((room) => {
+//     let queue_info =  [];
+//     for (let i = 0; i < room.queue.length; i++) {
+//       current_id = room.queue[i]; 
+//       queue_info[i] = {
+//         name: room.userInfos.get(current_id).name, 
+//         town: room.userInfos.get(current_id).town
+//       }
+//     }
+//     res.send(queue_info); 
+//   });
+// });
 
 router.post("/join", (req, res) => {
   // adds a user's socketID to the queue for the given room
@@ -215,7 +243,8 @@ router.post("/join", (req, res) => {
 
     // if the host is trying to join, don't let them
     if (userSocket === socket.getSocketFromUsername(room.owner)) {
-      updateHost(room);
+      updateQueueLength(room);
+      updateQueueArray(room); 
       res.send({});
       return;
     }
@@ -234,14 +263,20 @@ router.post("/join", (req, res) => {
         removeFromQueue(updatedRoom._id, userSocket.id);
       });
 
-      // tell the room owner how many people are in the queue
-      updateHost(updatedRoom);
-      updateUsers(updatedRoom);
-
-      // add the name to the userInfos (later populated with email, etc.)
+      
+      // add the name, email, phone, town to the userInfos
       updatedRoom.userInfos.set(req.body.socketID, {
         name: req.body.name,
+        email: req.body.email, 
+        phone: req.body.phone, 
+        town: req.body.town
       });
+
+      // tell the room owner how many people are in the queue
+      updateQueueLength(updatedRoom);
+      updateQueueArray(updatedRoom); 
+      updateUsers(updatedRoom);
+
       updatedRoom.save().then(() => {
         res.send({ success: true });
       });
@@ -294,7 +329,8 @@ router.post("/next", [needsCanCreateRooms], (req, res) => {
     let current;
     while (!current || !socket.getSocketFromSocketID(current)) {
       if (room.queue.length === 0) {
-        updateHost(room);
+        updateQueueLength(room);
+        updateQueueArray(room); 
         updateUsers(room);
         res.send({ success: true });
         return;
@@ -307,7 +343,8 @@ router.post("/next", [needsCanCreateRooms], (req, res) => {
     socket.getSocketFromSocketID(room.current).emit("host ready");
 
     // let the host know the queue length again, so they can update it
-    updateHost(room);
+    updateQueueLength(room);
+    updateQueueArray(room); 
     updateUsers(room);
 
     room.save().then(() => {
