@@ -97,7 +97,7 @@ router.post("/newroom", [needsCanCreateRooms], (req, res) => {
       roomName: req.body.roomName,
       owner: req.user.username,
       ownerDisplayName: req.user.displayName,
-      link: req.body.roomLink,
+      link: prefix + req.body.roomLink,
       waitMessage: req.body.waitingMessage,
       exitMessage: req.body.exitMessage,
       isPrivate: req.body.isPrivate,
