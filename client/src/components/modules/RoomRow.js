@@ -8,7 +8,7 @@ class RoomRow extends PureComponent {
   }
 
   handleDelete = () => {
-    post("/api/end", { id: this.props.room.id })
+    post("/api/endroom", { id: this.props.room.id })
       .then((res) => {
         if (res.success) {
           window.location.reload(false);

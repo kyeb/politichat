@@ -120,7 +120,7 @@ router.post("/newroom", [needsCanCreateRooms], (req, res) => {
   });
 });
 
-router.post("/end", [needsCanCreateRooms], (req, res) => {
+router.post("/endroom", [needsCanCreateRooms], (req, res) => {
   Room.findOne({ _id: req.body.id }).then((room) => {
     // tell the old user that they should exit the page
     const userSocket = socket.getSocketFromSocketID(room.current);
@@ -185,6 +185,7 @@ function removeFromQueue(roomID, userSocketID) {
       updateQueueLength(savedRoom);
       updateQueueArray(savedRoom);
       updateUsers(savedRoom);
+      updateIsUser(savedRoom); 
     });
   });
 }
@@ -202,11 +203,27 @@ function updateQueueArray(room){
     for (let i = 0; i < room.queue.length; i++) {
       current_id = room.queue[i]; 
       queue_info[i] = {
+        id: room.queue[i],
         name: room.userInfos.get(current_id).name, 
         town: room.userInfos.get(current_id).town
       }
     }
-  ownerSocket.emit("queue array", queue_info)
+  if (ownerSocket) {
+    ownerSocket.emit("queue array", queue_info); 
+  }
+}
+
+function updateIsUser(room){
+  const ownerSocket = socket.getSocketFromUsername(room.owner);
+  const userSocket = socket.getSocketFromSocketID(room.current);
+  console.log(userSocket); 
+  console.log(room.current); 
+  if (ownerSocket && room.current && userSocket) {
+    ownerSocket.emit("is User?", true);
+  }
+  else {
+    ownerSocket.emit("is User?", false);
+  }
 }
 
 function updateUsers(room) {
@@ -276,6 +293,7 @@ router.post("/join", (req, res) => {
       updateQueueLength(updatedRoom);
       updateQueueArray(updatedRoom); 
       updateUsers(updatedRoom);
+      updateIsUser(updatedRoom); 
 
       updatedRoom.save().then(() => {
         res.send({ success: true });
@@ -306,6 +324,82 @@ router.post("/submitInfo", (req, res) => {
   });
 });
 
+router.post("/enduser", [needsCanCreateRooms], (req, res) => {
+  Room.findOne({ _id: req.body.id }).then((room) => {
+    // ensure logged in as owner
+    if (req.user && room.owner !== req.user.username) {
+      res.status(401).send({});
+      return;
+    }
+
+    // fail if nobody in the chat
+    // the "end current conversation" button should be disabled in frontend until someone is there, 
+    // so this shouldn't be happen
+    if (!room.current || !socket.getSocketFromSocketID(room.current)) {
+      res.send({ success: false });
+      return;
+    }
+
+    if (room.current && socket.getSocketFromSocketID(room.current)) {
+      // tell the old user that they should exit the page
+      socket.getSocketFromSocketID(room.current).emit("leave please");
+      room.current = null; 
+      res.send({ success: true });
+      return; 
+    }
+    else {
+      res.send({ success: false });
+    }
+  });
+}); 
+
+router.post("/jump", [needsCanCreateRooms], (req, res) => {
+  Room.findOne({ _id: req.body.id }).then((room) => {
+    // ensure logged in as owner
+    if (req.user && room.owner !== req.user.username) {
+      res.status(401).send({});
+      return;
+    }
+
+    if (room.current && socket.getSocketFromSocketID(room.current)) {
+      // tell the old user that they should exit the page
+      socket.getSocketFromSocketID(room.current).emit("leave please");
+    }
+
+    let current;
+    while (!current || !socket.getSocketFromSocketID(current)) {
+      // shouldn't happen because no users displayed if no one in queue 
+      if (room.queue.length === 0) {
+        updateQueueLength(room);
+        updateQueueArray(room); 
+        updateUsers(room);
+        updateIsUser(room); 
+        res.send({ success: true });
+        return;
+      }
+      current = room.queue.filter(item => item === req.body.user)[0]; // grab user from array
+
+      let new_queue = room.queue.filter(item => item !== current); // remove user from array
+
+      room.queue = new_queue; // update room.queue
+    }
+    room.current = current;
+
+    // tell the first user in the queue they can connect
+    socket.getSocketFromSocketID(room.current).emit("host ready");
+
+    // let the host know the queue length again, so they can update it
+    updateQueueLength(room);
+    updateQueueArray(room); 
+    updateUsers(room);
+    updateIsUser(room); 
+
+    room.save().then(() => {
+      res.send({ success: true });
+    });
+  });
+});
+
 router.post("/next", [needsCanCreateRooms], (req, res) => {
   Room.findOne({ _id: req.body.id }).then((room) => {
     // ensure logged in as owner
@@ -332,6 +426,7 @@ router.post("/next", [needsCanCreateRooms], (req, res) => {
         updateQueueLength(room);
         updateQueueArray(room); 
         updateUsers(room);
+        updateIsUser(room); 
         res.send({ success: true });
         return;
       }
@@ -346,6 +441,7 @@ router.post("/next", [needsCanCreateRooms], (req, res) => {
     updateQueueLength(room);
     updateQueueArray(room); 
     updateUsers(room);
+    updateIsUser(room); 
 
     room.save().then(() => {
       res.send({ success: true });
