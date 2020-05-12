@@ -367,6 +367,7 @@ router.post("/jump", [needsCanCreateRooms], (req, res) => {
     }
 
     let current;
+    let track_for_error = 0; 
     while (!current || !socket.getSocketFromSocketID(current)) {
       // shouldn't happen because no users displayed if no one in queue 
       if (room.queue.length === 0) {
@@ -382,6 +383,12 @@ router.post("/jump", [needsCanCreateRooms], (req, res) => {
       let new_queue = room.queue.filter(item => item !== current); // remove user from array
 
       room.queue = new_queue; // update room.queue
+
+      if(track_for_error >= 1000){
+        logger.info();
+        break; 
+      }
+      track_for_error++; 
     }
     room.current = current;
 
