@@ -13,33 +13,39 @@
 | - Actually starts the webserver
 */
 
-//get environment variables configured
-require("dotenv").config();
+// get environment variables configured
+import dotenv from "dotenv";
+import pino from "pino";
 
-//import libraries needed for the webserver to work!
-const http = require("http");
-const express = require("express"); // backend framework for our node server.
+dotenv.config();
+const logger = pino();
+
+import { Server } from "http";
+import express from "express";
+import expressSession from "express-session";
+import path from "path";
+const __dirname = path.resolve();
+
+import { init } from "./db.js";
 
 // library that stores info about each connected user
-const session = require("express-session")({
+const session = expressSession({
   secret: "secret!!!",
   resave: false,
   saveUninitialized: true,
 });
 
-const path = require("path"); // provide utilities for working with file and directory paths
+import { resolve, join } from "path"; // provide utilities for working with file and directory paths
 
-const api = require("./api");
-const auth = require("./auth");
-const passport = require("./passport");
+import api from "./api.js";
+import auth from "./routes/auth.js";
+import passport from "./passport.js";
 
 // import socket
-const socket = require("./server-socket");
+import socket from "./server-socket.js";
 
-const logger = require("pino")(); // import pino logger
-
-//connect and initialize your database!
-require("./db").init();
+// initialize database connection
+init();
 
 // create a new express server
 const app = express();
@@ -61,12 +67,12 @@ app.use("/auth", auth);
 app.use("/api", api);
 
 // load the compiled react files, which will serve /index.html and /bundle.js
-const reactPath = path.resolve(__dirname, "..", "client", "dist");
+const reactPath = resolve(__dirname, "..", "client", "dist");
 app.use(express.static(reactPath));
 
 // for all other routes, render index.html and let react router handle it
 app.get("*", (req, res) => {
-  res.sendFile(path.join(reactPath, "index.html"));
+  res.sendFile(join(reactPath, "index.html"));
 });
 
 // any server errors cause this function to run
@@ -86,7 +92,7 @@ app.use((err, req, res, next) => {
 
 // listen to env var for port, otherwise default to 3000.
 const port = process.env.PORT || 3000;
-const server = http.Server(app);
+const server = Server(app);
 socket.init(server, session);
 
 server.listen(port, () => {

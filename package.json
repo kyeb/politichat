@@ -12,6 +12,7 @@
     "type": "git",
     "url": ""
   },
+  "type": "module",
   "author": "",
   "license": "MIT",
   "homepage": "",
