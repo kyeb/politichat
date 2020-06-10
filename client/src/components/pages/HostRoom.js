@@ -16,7 +16,7 @@ class HostRoom extends Component {
       isUser: false,
       queueLength: this.props.room ? this.props.room.queue.length : 0,
       copied: false,
-    }; 
+    };
   }
 
   load() {
@@ -25,15 +25,15 @@ class HostRoom extends Component {
 
   componentDidMount() {
     socket.on("queue status", (queueLength) => {
-      console.log(queueLength); 
+      console.log(queueLength);
       this.setState({ queueLength });
     });
     socket.on("queue array", (queueList) => {
-      this.setState({ queueList }); 
-    })
+      this.setState({ queueList });
+    });
     socket.on("is User?", (isUser) => {
-      this.setState({ isUser })
-    })
+      this.setState({ isUser });
+    });
     this.timeout = setTimeout(this.load.bind(this), 500);
   }
 
@@ -44,10 +44,10 @@ class HostRoom extends Component {
   }
 
   handleKickUser = () => {
-    post("/api/enduser", {id: this.props.room.id })
+    post("/api/enduser", { id: this.props.room.id })
       .then((res) => {
         if (res.success) {
-          this.setState( { isUser: false });
+          this.setState({ isUser: false });
           this.setState({ ready: true });
         } else {
           error(res, "No participants currently in the chat");
@@ -56,10 +56,10 @@ class HostRoom extends Component {
       .catch((err) => {
         error(err, "POST to /api/enduser failed.");
       });
-  }
+  };
 
   handleNext = () => {
-    post("/api/next", { id: this.props.room.id })
+    post("/api/room/next", { id: this.props.room.id })
       .then((res) => {
         if (res.success) {
           this.setState({ ready: true });
@@ -68,12 +68,12 @@ class HostRoom extends Component {
         }
       })
       .catch((err) => {
-        error(err, "POST to /api/next failed.");
+        error(err, "POST to /api/room/next failed.");
       });
   };
 
   handleEnd = () => {
-    post("/api/endroom", { id: this.props.room.id })
+    post("/api/room/end", { id: this.props.room.id })
       .then((res) => {
         if (res.success) {
           navigate(`/exit/host/${this.props.room.id}`);
@@ -82,10 +82,9 @@ class HostRoom extends Component {
         }
       })
       .catch((err) => {
-        error(err, "POST to /api/endroom failed.");
+        error(err, "POST to /api/room/end failed.");
       });
   };
-
 
   render() {
     // Set up a video chat if we got a room back from API, otherwise show loader
@@ -97,42 +96,44 @@ class HostRoom extends Component {
       jitsi = <Loader active />;
     }
 
-    let leftColumn = (
-      <div>
-        {jitsi}
-      </div>
-    );
-    
-    let queueDisplay = <div />; 
-    if(this.state.queueList.length !== 0){
+    let leftColumn = <div>{jitsi}</div>;
+
+    let queueDisplay = <div />;
+    if (this.state.queueList.length !== 0) {
       queueDisplay = (
-          <Table>
-            <Table.Header>
-              <Table.Row>
+        <Table>
+          <Table.Header>
+            <Table.Row>
               <Table.HeaderCell>Name</Table.HeaderCell>
               <Table.HeaderCell>Town</Table.HeaderCell>
               <Table.HeaderCell></Table.HeaderCell>
-              </Table.Row>
-            </Table.Header>
+            </Table.Row>
+          </Table.Header>
 
-            <Table.Body>
-              {this.state.queueList.map((user) => {
-                return <ConstituentRow key = {user.id} room={this.props.room} name={user.name} town={user.town} user = {user} />; 
-              })}
-            </Table.Body>
-          </Table> 
-      )  
-    };
-
+          <Table.Body>
+            {this.state.queueList.map((user) => {
+              return (
+                <ConstituentRow
+                  key={user.id}
+                  room={this.props.room}
+                  name={user.name}
+                  town={user.town}
+                  user={user}
+                />
+              );
+            })}
+          </Table.Body>
+        </Table>
+      );
+    }
 
     let rightColumn = (
       <div>
         <p> Number of participants in queue: {this.state.queueLength}</p>
         {queueDisplay}
-      </div> 
-    ); 
-  
-    
+      </div>
+    );
+
     const controller = (
       <div className="controller-owner">
         <div>
@@ -169,17 +170,11 @@ class HostRoom extends Component {
     return (
       <>
         {controller}
-        <Divider section
-        />
-          <div className="ui grid">
-              <div class = "thirteen wide column"> 
-                {leftColumn}
-              </div>
-              <div class = "three wide column">
-                {rightColumn}
-              </div>
-            
-          </div>
+        <Divider section />
+        <div className="ui grid">
+          <div class="thirteen wide column">{leftColumn}</div>
+          <div class="three wide column">{rightColumn}</div>
+        </div>
       </>
     );
   }

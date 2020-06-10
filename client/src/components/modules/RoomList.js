@@ -21,7 +21,7 @@ class RoomList extends Component {
   }
 
   componentDidMount() {
-    get("/api/rooms").then((rooms) => {
+    get("/api/room/list").then((rooms) => {
       this.setState({ rooms: rooms, loading: false });
     });
   }

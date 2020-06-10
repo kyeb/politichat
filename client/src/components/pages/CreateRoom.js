@@ -14,7 +14,7 @@ class CreateRoom extends Component {
       newRoomExit: "",
       newRoomPrivate: true,
       newRoomScheduled: false,
-      newRoomDatetime: ""
+      newRoomDatetime: "",
     };
   }
 
@@ -27,34 +27,36 @@ class CreateRoom extends Component {
         alert("Scheduled time invalid");
       }
       if (parts[5] === "AM") {
-        parts[3] = (parts[3] === "12") ? 0 : parts[3];
+        parts[3] = parts[3] === "12" ? 0 : parts[3];
       } else {
-        parts[3] = (parts[3] === "12") ? 12 : 12 + parseInt(parts[3]);
+        parts[3] = parts[3] === "12" ? 12 : 12 + parseInt(parts[3]);
       }
       parts = parts.slice(0, -1).map((x) => parseInt(x));
       datetime = new Date(parts[2], parts[0] - 1, parts[1], parts[3], parts[4]).getTime();
     }
 
-    post("/api/newroom", {
+    post("/api/room/new", {
       roomName: this.state.newRoomName,
       roomLink: this.state.newRoomLink,
       waitingMessage: this.state.newRoomWaiting,
       exitMessage: this.state.newRoomExit,
       isPrivate: this.state.newRoomPrivate,
       isScheduled: this.state.newRoomScheduled,
-      datetime: datetime
-    }).then((room) => {
-      if (this.state.newRoomScheduled) {
-        // if room is in the future, return to homepage
-        navigate("/");
-      } else {
-        navigate(`/room/${room.id}`);
-      }
-    }).catch((err) => {
-      alert(
-        "Something went wrong! Try a different name or reloading.\n\nTip: room names cannot contain special characters, and make sure the URL is valid."
-      );
-    });
+      datetime: datetime,
+    })
+      .then((room) => {
+        if (this.state.newRoomScheduled) {
+          // if room is in the future, return to homepage
+          navigate("/");
+        } else {
+          navigate(`/room/${room.id}`);
+        }
+      })
+      .catch((err) => {
+        alert(
+          "Something went wrong! Try a different name or reloading.\n\nTip: room names cannot contain special characters, and make sure the URL is valid."
+        );
+      });
   };
 
   load() {
@@ -140,7 +142,9 @@ class CreateRoom extends Component {
       <Form.Checkbox
         checked={this.state.newRoomPrivate}
         label={<label>Private</label>}
-        onChange={(event) => this.setState((prevState) => ({ newRoomPrivate: !prevState.newRoomPrivate }))}
+        onChange={(event) =>
+          this.setState((prevState) => ({ newRoomPrivate: !prevState.newRoomPrivate }))
+        }
       />
     );
 
@@ -148,11 +152,13 @@ class CreateRoom extends Component {
       <Form.Checkbox
         checked={this.state.newRoomScheduled}
         label={<label>Schedule for later</label>}
-        onChange={(event) => this.setState((prevState) => ({ newRoomScheduled: !prevState.newRoomScheduled }))}
+        onChange={(event) =>
+          this.setState((prevState) => ({ newRoomScheduled: !prevState.newRoomScheduled }))
+        }
       />
     );
 
-    let datetimePicker = <div/>;
+    let datetimePicker = <div />;
     if (this.state.newRoomScheduled) {
       datetimePicker = (
         <DateTimeInput
@@ -160,7 +166,7 @@ class CreateRoom extends Component {
           closeOnMouseLeave={false}
           dateTimeFormat="MM-DD-YYYY hh:mm A"
           iconPosition="left"
-          onChange={(event, {name, value}) => this.setState({ newRoomDatetime: value })}
+          onChange={(event, { name, value }) => this.setState({ newRoomDatetime: value })}
           placeholder="Scheduled time"
           preserveViewMode={false}
           value={this.state.newRoomDatetime}
@@ -189,7 +195,7 @@ class CreateRoom extends Component {
         </Form>
       </div>
     );
-  };
-};
+  }
+}
 
 export default CreateRoom;

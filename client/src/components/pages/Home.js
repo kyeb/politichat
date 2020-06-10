@@ -17,7 +17,7 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    get("/api/rooms").then((rooms) => {
+    get("/api/room/list").then((rooms) => {
       let ids = rooms.map((room) => room.id);
       this.setState({ roomIds: ids });
     });
@@ -44,7 +44,7 @@ class Home extends Component {
   };
 
   handleUpdateDisplayName = () => {
-    post("/api/displayname", { displayName: this.state.newDisplayName })
+    post("/api/user/displayname", { displayName: this.state.newDisplayName })
       .then((res) => {
         if (res.success) {
           this.props.user.displayName = this.state.newDisplayName;

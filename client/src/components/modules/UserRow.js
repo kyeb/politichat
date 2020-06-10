@@ -32,7 +32,7 @@ class UserRow extends PureComponent {
   };
 
   handleToggleWorker = () => {
-    post("/api/user/updatepermissions", {
+    post("/api/user/permissions", {
       id: this.props.user.id,
       canCreateRooms: !this.state.canCreateRooms,
     })

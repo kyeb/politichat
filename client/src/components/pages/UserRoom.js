@@ -81,16 +81,15 @@ class UserRoom extends Component {
         phoneError: "",
       });
 
-      post("/api/join", {
+      post("/api/room/join", {
         roomID: this.props.room.id,
         socketID: socket.id,
         name: this.state.userInfo.name,
-        email: this.state.userInfo.email, 
-        phone: this.state.userInfo.phone, 
-        town: this.state.userInfo.town
+        email: this.state.userInfo.email,
+        phone: this.state.userInfo.phone,
+        town: this.state.userInfo.town,
       })
-        .then(() => {
-        })
+        .then(() => {})
         .catch((err) => error(err, "Joining room failed"));
       this.setState({ joinedQueue: true });
     } else {
@@ -103,7 +102,6 @@ class UserRoom extends Component {
 
   render() {
     if (!this.state.joinedQueue) {
-
       let makeErrorLabel = (error) => {
         if (error) {
           return (
@@ -118,9 +116,9 @@ class UserRoom extends Component {
       return (
         <>
           <p>
-            Enter your information below to join the queue to speak with {this.props.room.ownerDisplayName}
-            !
-          </p>    
+            Enter your information below to join the queue to speak with{" "}
+            {this.props.room.ownerDisplayName}!
+          </p>
           <Form>
             <Form.Field className="userroom-info">
               <Input
@@ -197,7 +195,11 @@ class UserRoom extends Component {
               className="userroom-infobutton"
               onClick={this.handleJoinQueue}
               type="button"
-              disabled={this.state.userInfo.name === "" || this.state.userInfo.email === "" || this.state.userInfo.town === ""}
+              disabled={
+                this.state.userInfo.name === "" ||
+                this.state.userInfo.email === "" ||
+                this.state.userInfo.town === ""
+              }
             >
               Join Queue
             </Form.Button>
@@ -259,14 +261,19 @@ class UserRoom extends Component {
           {futureMessage}
           <Button
             onClick={() => {
-              post("/api/leavequeue", { roomID: this.props.room.id, socketID: socket.id });
+              post("/api/room/leavequeue", { roomID: this.props.room.id, socketID: socket.id });
               navigate("/");
             }}
             content="Leave queue"
             floated="right"
           />
           <h3>Waiting in line to speak to {this.props.room.ownerDisplayName}...</h3>
-          {this.props.room.ownerDisplayName && <p>{this.props.room.ownerDisplayName} is currently speaking with constituents, but looks forward to speaking with you soon!</p>}
+          {this.props.room.ownerDisplayName && (
+            <p>
+              {this.props.room.ownerDisplayName} is currently speaking with constituents, but looks
+              forward to speaking with you soon!
+            </p>
+          )}
           <Divider section />
           <div className="twocolumn">
             {leftColumn}

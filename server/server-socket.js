@@ -40,7 +40,7 @@ const removeUser = (user, socket) => {
 
 const socket = {
   init: (http, session) => {
-    const io = socketio(http);
+    io = socketio(http);
     //set up socket middleware
     io.use(
       sharedsession(session, {

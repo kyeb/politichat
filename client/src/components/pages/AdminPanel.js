@@ -19,7 +19,7 @@ class AdminPanel extends Component {
   }
 
   handleClearEnded = () => {
-    post("/api/cleanended").then((res) => {
+    post("/api/room/clean").then((res) => {
       if (res.success) {
         window.location.reload(false);
       }
@@ -27,9 +27,9 @@ class AdminPanel extends Component {
   };
 
   componentDidMount() {
-    get("/api/users").then((users) => this.setState({ users }));
-    get("/api/rooms").then((rooms) => this.setState({ rooms }));
-    get("/api/totalrooms").then((roomCount) => this.setState(roomCount));
+    get("/api/user/list").then((users) => this.setState({ users }));
+    get("/api/room/list").then((rooms) => this.setState({ rooms }));
+    get("/api/room/count").then((roomCount) => this.setState(roomCount));
     this.timeout = setTimeout(this.load.bind(this), 500);
   }
 
