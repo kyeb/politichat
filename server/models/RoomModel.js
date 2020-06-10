@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 var schemaOptions = {
   toJSON: {
     transform: function (doc, ret) {
@@ -30,4 +30,5 @@ const RoomSchema = new mongoose.Schema(
 );
 
 // compile model from schema
-module.exports = mongoose.model("room", RoomSchema);
+const Room = mongoose.model("room", RoomSchema);
+export default Room;

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 var schemaOptions = {
   toJSON: {
     transform: function (doc, ret) {
@@ -25,4 +25,5 @@ const UserSchema = new mongoose.Schema(
 );
 
 // compile model from schema
-module.exports = mongoose.model("user", UserSchema);
+const User = mongoose.model("user", UserSchema);
+export default User;

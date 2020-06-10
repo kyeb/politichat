@@ -6,18 +6,22 @@
 | This file defines the API authentication routes for your server.
 |
 */
-const express = require("express");
-const logger = require("pino")(); // import pino logger
-const passport = require("./passport");
+import express from "express";
+
+import pino from "pino";
+const logger = pino();
+
+import passport from "../passport.js";
 //add error handling to async endpoints
-const { decorateRouter } = require("@awaitjs/express");
+import pkg from "@awaitjs/express";
+const { decorateRouter } = pkg;
 
 // api endpoints: all these paths will be prefixed with "/api/"
 const router = decorateRouter(express.Router());
 
 const SALT_ROUNDS = 10;
-const bcrypt = require("bcrypt");
-const User = require("./models/user");
+import bcrypt from "bcrypt";
+import User from "../models/UserModel.js";
 const ALREADY_REGISTERED_ERROR = "username_conflict";
 
 router.get("/logout", (req, res) => {
@@ -68,4 +72,4 @@ router.post("/login", passport.authenticate("local"), function (req, res) {
   res.send(req.user);
 });
 
-module.exports = router;
+export default router;

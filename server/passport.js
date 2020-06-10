@@ -1,8 +1,8 @@
-const passport = require("passport");
-var LocalStrategy = require("passport-local");
+import passport from "passport";
+import LocalStrategy from "passport-local";
 
-const User = require("./models/user");
-const bcrypt = require("bcrypt");
+import User from "./models/UserModel.js";
+import bcrypt from "bcrypt";
 
 function getLocalUser(username) {
   return User.findOne({ username })
@@ -42,4 +42,4 @@ passport.deserializeUser(function (id, done) {
   });
 });
 
-module.exports = passport;
+export default passport;
