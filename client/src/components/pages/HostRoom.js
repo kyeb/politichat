@@ -59,7 +59,7 @@ class HostRoom extends Component {
   };
 
   handleNext = () => {
-    post("/api/room/next", { id: this.props.room.id })
+    post("/api/queue/next", { id: this.props.room.id })
       .then((res) => {
         if (res.success) {
           this.setState({ ready: true });
@@ -68,7 +68,7 @@ class HostRoom extends Component {
         }
       })
       .catch((err) => {
-        error(err, "POST to /api/room/next failed.");
+        error(err, "POST to /api/queue/next failed.");
       });
   };
 

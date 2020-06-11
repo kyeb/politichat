@@ -14,13 +14,13 @@ import pino from "pino";
 const logger = pino();
 
 import Room from "./models/RoomModel.js";
-import User from "./models/UserModel.js";
 
 import { needsCanCreateRooms } from "./middleware.js";
 
 // api endpoints: all these paths will be prefixed with "/api/"
 const router = express.Router();
 
+// UNUSED: all information is sent to /join now
 router.post("/submitInfo", (req, res) => {
   // add/update a user's info
   Room.findOne({ _id: req.body.roomID }).then((room) => {
@@ -76,6 +76,9 @@ router.use("/room", room);
 
 import user from "./routes/user.js";
 router.use("/user", user);
+
+import queue from "./routes/queue.js";
+router.use("/queue", queue);
 
 // anything else falls to this "not found" case
 router.all("*", (req, res) => {

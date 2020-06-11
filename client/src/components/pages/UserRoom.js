@@ -81,7 +81,7 @@ class UserRoom extends Component {
         phoneError: "",
       });
 
-      post("/api/room/join", {
+      post("/api/queue/join", {
         roomID: this.props.room.id,
         socketID: socket.id,
         name: this.state.userInfo.name,
@@ -261,7 +261,7 @@ class UserRoom extends Component {
           {futureMessage}
           <Button
             onClick={() => {
-              post("/api/room/leavequeue", { roomID: this.props.room.id, socketID: socket.id });
+              post("/api/queue/leave", { roomID: this.props.room.id, socketID: socket.id });
               navigate("/");
             }}
             content="Leave queue"
