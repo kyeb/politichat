@@ -9,7 +9,7 @@ class ConstituentRow extends PureComponent {
   }
 
   handleJump = () => {
-    post("/api/room/jump", { id: this.props.room.id, user: this.props.user.id })
+    post("/api/queue/jump", { id: this.props.room.id, user: this.props.user.id })
       .then((res) => {
         if (res.success) {
           this.setState({ ready: true });
@@ -18,7 +18,7 @@ class ConstituentRow extends PureComponent {
         }
       })
       .catch((err) => {
-        error(err, "POST to /api/room/jump failed.");
+        error(err, "POST to /api/queue/jump failed.");
       });
   };
 
