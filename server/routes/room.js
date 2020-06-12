@@ -6,9 +6,35 @@ const logger = pino();
 
 import Room from "../models/RoomModel.js";
 import { needsAdmin, needsCanCreateRooms } from "../middleware.js";
-import { isValid, validURL } from "../utilities.js";
 
-// api endpoints: all these paths will be prefixed with "/api/room/"
+///////////////////////////////////////////////////////////////////////////////
+// utility functions
+///////////////////////////////////////////////////////////////////////////////
+
+export function isValid(str) {
+  var check = new RegExp(/[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/);
+  if (check.test(str)) {
+    return false;
+  }
+  return true;
+}
+
+export function validURL(str) {
+  var pattern = new RegExp(
+    "^(https?:\\/\\/)?" + // protocol
+    "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+    "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+    "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+    "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+      "(\\#[-a-z\\d_]*)?$",
+    "i"
+  ); // fragment locator
+  return !!pattern.test(str);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// routes
+///////////////////////////////////////////////////////////////////////////////
 const router = express.Router();
 
 router.post("/new", [needsCanCreateRooms], (req, res) => {
@@ -124,29 +150,6 @@ router.get("/", (req, res) => {
     res.send(room);
   });
 });
-
-function updateQueueLength(room) {
-  const ownerSocket = socket.getSocketFromUsername(room.owner);
-  if (ownerSocket) {
-    ownerSocket.emit("queue status", room.queue.length);
-  }
-}
-
-function updateQueueArray(room) {
-  const ownerSocket = socket.getSocketFromUsername(room.owner);
-  let queue_info = [];
-  for (let i = 0; i < room.queue.length; i++) {
-    let current_id = room.queue[i];
-    queue_info[i] = {
-      id: room.queue[i],
-      name: room.userInfos.get(current_id).name,
-      town: room.userInfos.get(current_id).town,
-    };
-  }
-  if (ownerSocket) {
-    ownerSocket.emit("queue array", queue_info);
-  }
-}
 
 router.get("/count", [needsAdmin], (req, res) => {
   Room.count({}).then((count) => {

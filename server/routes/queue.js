@@ -7,10 +7,10 @@ const logger = pino();
 import Room from "../models/RoomModel.js";
 
 import { needsCanCreateRooms } from "../middleware.js";
-// api endpoints: all these paths will be prefixed with "/api/queue/"
-const router = express.Router();
 
+///////////////////////////////////////////////////////////////////////////////
 // utility functions
+///////////////////////////////////////////////////////////////////////////////
 
 function removeFromQueue(roomID, userSocketID) {
   Room.findOne({ _id: roomID }).then((room) => {
@@ -46,7 +46,34 @@ function updateUsers(room) {
   }
 }
 
+function updateQueueLength(room) {
+  const ownerSocket = socket.getSocketFromUsername(room.owner);
+  if (ownerSocket) {
+    ownerSocket.emit("queue status", room.queue.length);
+  }
+}
+
+function updateQueueArray(room) {
+  const ownerSocket = socket.getSocketFromUsername(room.owner);
+  let queue_info = [];
+  for (let i = 0; i < room.queue.length; i++) {
+    let current_id = room.queue[i];
+    queue_info[i] = {
+      id: room.queue[i],
+      // TODO: something is weird here (getting errors)
+      name: room.userInfos.get(current_id).name,
+      town: room.userInfos.get(current_id).town,
+    };
+  }
+  if (ownerSocket) {
+    ownerSocket.emit("queue array", queue_info);
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // routes
+///////////////////////////////////////////////////////////////////////////////
+const router = express.Router();
 
 router.post("/leave", (req, res) => {
   removeFromQueue(req.body.roomID, req.body.socketID);
