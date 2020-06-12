@@ -20,29 +20,16 @@ import { needsCanCreateRooms } from "./middleware.js";
 // api endpoints: all these paths will be prefixed with "/api/"
 const router = express.Router();
 
-// UNUSED: all information is sent to /join now
-router.post("/submitInfo", (req, res) => {
-  // add/update a user's info
-  Room.findOne({ _id: req.body.roomID }).then((room) => {
-    if (!room) {
-      res.status(404).send({});
-      return;
-    }
+import room from "./routes/room.js";
+router.use("/room", room);
 
-    // ensure is valid email
-    let emailOkay = !req.body.userInfo.email || /\S+@\S+\.\S+/.test(req.body.userInfo.email);
-    let phoneOkay = !req.body.userInfo.phone || /[\d()\- ]+/.test(req.body.userInfo.phone);
-    if (emailOkay && phoneOkay) {
-      room.userInfos.set(req.body.socketID, req.body.userInfo);
-      room.save().then(() => {
-        res.send({ success: true });
-      });
-    } else {
-      res.status(400).send({});
-    }
-  });
-});
+import user from "./routes/user.js";
+router.use("/user", user);
 
+import queue from "./routes/queue.js";
+router.use("/queue", queue);
+
+// TODO: move this to the right spot
 router.post("/enduser", [needsCanCreateRooms], (req, res) => {
   Room.findOne({ _id: req.body.id }).then((room) => {
     // ensure logged in as owner
@@ -70,15 +57,6 @@ router.post("/enduser", [needsCanCreateRooms], (req, res) => {
     }
   });
 });
-
-import room from "./routes/room.js";
-router.use("/room", room);
-
-import user from "./routes/user.js";
-router.use("/user", user);
-
-import queue from "./routes/queue.js";
-router.use("/queue", queue);
 
 // anything else falls to this "not found" case
 router.all("*", (req, res) => {
