@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import AuthController from "../modules/AuthController";
 import RoomList from "../modules/RoomList";
-import { Form, Input, Label, Message, Divider, Loader } from "semantic-ui-react";
+import { Form, Input, Message, Divider } from "semantic-ui-react";
 import { get, post } from "../../utilities";
 import { navigate } from "@reach/router";
 
