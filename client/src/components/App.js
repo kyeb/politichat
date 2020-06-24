@@ -15,6 +15,7 @@ import AuthController from "./modules/AuthController";
 import RoomContainer from "./pages/RoomContainer";
 import ExitPage from "./pages/ExitPage";
 import AdminPanel from "./pages/AdminPanel";
+import HomepageLayout from "./pages/NewHomepage";
 
 /**
  * Define the "App" component as a class.
@@ -56,8 +57,8 @@ class App extends Component {
       />
     );
 
-    return (
-      <div className="app-container">
+    const header = (
+      <>
         <header>
           <h1 className="header">
             <FontAwesomeIcon icon={faCommentAlt} className="header-icon" />
@@ -85,28 +86,52 @@ class App extends Component {
           )}
         </header>
         <Divider />
-        <Router>
-          <Home
-            path="/"
-            setUser={this.setUser}
-            logout={this.handleLogout}
-            user={this.state.user}
-            socketConnected={this.state.socketConnected}
-          />
-          <CreateRoom path="/create" user={this.state.user} />
-          <AdminPanel path="/admin" user={this.state.user} />
-          <RoomContainer
-            path="/room/:roomId"
-            user={this.state.user}
-            socketConnected={this.state.socketConnected}
-          />
-          <ExitPage path="/exit/:reason/:roomId" user={this.state.user} />
-          <NotFound default />
-        </Router>
-        <footer>
-          <p className="footer-content">Made by Sabrina, Kye, and Daniel for CS91r</p>
-        </footer>
-      </div>
+      </>
+    );
+
+    const footer = (
+      <footer>
+        <p className="footer-content">Made by Sabrina, Kye, and Daniel for CS91r</p>
+      </footer>
+    );
+
+    const app = (
+      <Router>
+        <Home
+          path="/dashboard"
+          setUser={this.setUser}
+          logout={this.handleLogout}
+          user={this.state.user}
+          socketConnected={this.state.socketConnected}
+        />
+        <CreateRoom path="/create" user={this.state.user} />
+        <AdminPanel path="/admin" user={this.state.user} />
+        <RoomContainer
+          path="/room/:roomId"
+          user={this.state.user}
+          socketConnected={this.state.socketConnected}
+        />
+        <ExitPage path="/exit/:reason/:roomId" user={this.state.user} />
+        <HomepageLayout path="/" />
+        <NotFound default />
+      </Router>
+    );
+
+    // on homepage, don't render app container or header
+    return (
+      <Match path="/">
+        {(props) =>
+          props.match ? (
+            <>{app}</>
+          ) : (
+            <>
+              <div className="app-container">
+                {header} {app} {footer}
+              </div>
+            </>
+          )
+        }
+      </Match>
     );
   }
 }
