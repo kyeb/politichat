@@ -30,7 +30,7 @@ const HomepageHeading = ({ mobile }) => (
         fontSize: mobile ? "2em" : "4em",
         fontWeight: "normal",
         marginBottom: 0,
-        marginTop: mobile ? "1.5em" : "3em",
+        marginTop: mobile ? "1em" : "2em",
       }}
     >
       Politichat
@@ -43,10 +43,29 @@ const HomepageHeading = ({ mobile }) => (
         marginTop: mobile ? "0.5em" : "1.5em",
       }}
     >
-      Seamless, virtual 1-1 conversations for campaigns
+      Seamless virtual 1-1 conversations between campaigns and constituents
+    </Header>
+    <Header
+      inverted
+      style={{
+        fontSize: mobile ? "1.5em" : "1.7em",
+        fontWeight: "normal",
+        marginTop: mobile ? "0.66em" : "2em",
+      }}
+    >
+      Continue as...
     </Header>
     <Button primary size="huge">
-      Get Started
+      Campaign
+      <Icon name="right arrow" />
+    </Button>
+    <Button 
+      size="huge"
+      style={{
+        marginLeft: mobile ? "0.5em" : "1em",
+      }}
+    >
+      Constituent
       <Icon name="right arrow" />
     </Button>
   </Container>
