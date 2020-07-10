@@ -47,7 +47,7 @@ class CreateRoom extends Component {
       .then((room) => {
         if (this.state.newRoomScheduled) {
           // if room is in the future, return to homepage
-          navigate("/");
+          navigate("/dashboard");
         } else {
           navigate(`/room/${room.id}`);
         }

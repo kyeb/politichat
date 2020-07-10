@@ -70,7 +70,7 @@ class App extends Component {
                 <Match path="/admin">
                   {(props) =>
                     props.match ? (
-                      <Button className="header-admin" onClick={() => navigate("/")}>
+                      <Button className="header-admin" onClick={() => navigate("/dashboard")}>
                         Home
                       </Button>
                     ) : (
