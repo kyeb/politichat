@@ -262,7 +262,7 @@ class UserRoom extends Component {
           <Button
             onClick={() => {
               post("/api/queue/leave", { roomID: this.props.room.id, socketID: socket.id });
-              navigate("/");
+              navigate("/dashboard");
             }}
             content="Leave queue"
             floated="right"

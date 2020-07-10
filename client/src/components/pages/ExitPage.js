@@ -85,7 +85,7 @@ class ExitPage extends Component {
             roomId={this.state.room.id}
           />
           <Divider />
-          <Button onClick={() => navigate("/")} content="Exit" />
+          <Button onClick={() => navigate("/dashboard")} content="Exit" />
         </>
       );
     }
