@@ -27,6 +27,11 @@ class LoggedInHome extends Component {
   };
 
   handleUpdateDisplayName = () => {
+    if (!this.state.newDisplayName) {
+      alert("Please enter your new display name.");
+      return;
+    }
+
     post("/api/user/displayname", { displayName: this.state.newDisplayName })
       .then((res) => {
         if (res.success) {

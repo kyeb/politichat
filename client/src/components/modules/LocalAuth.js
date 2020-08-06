@@ -44,6 +44,8 @@ class LocalAuth extends Component {
       this.setState({ errorMessage: "Passwords don't match" });
     } else if (username === "" || password === "") {
       this.setState({ errorMessage: "Cannot have an empty username or password!" });
+    } else if (displayName === "") {
+      this.setState({ errorMessage: "Please enter a display name" });
     } else {
       post("/auth/register", { username, password, displayName })
         .then((user) => {
