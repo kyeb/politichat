@@ -30,7 +30,7 @@ class RoomContainer extends Component {
       return (
         <>
           <Message negative>This room does not seem to exist right now :/</Message>
-          <Button onClick={() => navigate("/")}>Go home</Button>
+          <Button onClick={() => navigate("/dashboard")}>Go home</Button>
         </>
       );
     }

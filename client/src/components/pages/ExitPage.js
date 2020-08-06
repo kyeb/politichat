@@ -72,8 +72,8 @@ class ExitPage extends Component {
       return (
         <>
           <h2>
-            Thank you for hosting a room on Politichat,
-            {" " + this.props.user?.displayName}!
+            Thank you for hosting a room on Politichat
+            {this.props.user && ", " + this.props.user?.displayName}!
           </h2>
           <p>
             Please send any questions or feedback to
@@ -85,7 +85,7 @@ class ExitPage extends Component {
             roomId={this.state.room.id}
           />
           <Divider />
-          <Button onClick={() => navigate("/")} content="Exit" />
+          <Button onClick={() => navigate("/dashboard")} content="Exit" />
         </>
       );
     }

@@ -1,5 +1,6 @@
-const sharedsession = require("express-socket.io-session");
-const User = require("./models/user");
+import sharedsession from "express-socket.io-session";
+import User from "./models/UserModel.js";
+import socketio from "socket.io";
 
 let io;
 
@@ -37,9 +38,9 @@ const removeUser = (user, socket) => {
   io.emit("activeUsers", { activeUsers: getAllConnectedUsers() });
 };
 
-module.exports = {
+const socket = {
   init: (http, session) => {
-    io = require("socket.io")(http);
+    io = socketio(http);
     //set up socket middleware
     io.use(
       sharedsession(session, {
@@ -79,3 +80,4 @@ module.exports = {
 
   getIo: () => io,
 };
+export default socket;

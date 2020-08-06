@@ -22,7 +22,7 @@ class AuthController extends Component {
 
   login = (user) => {
     this.props.setUser(user);
-    post("/api/initsocket", { socketid: socket.id });
+    post("/api/user/initsocket", { socketid: socket.id });
   };
 
   logout = () => {
