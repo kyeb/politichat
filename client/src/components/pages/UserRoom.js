@@ -2,6 +2,9 @@ import React, { Component } from "react";
 import { navigate } from "@reach/router";
 import { Button, Divider, Form, Input, Label, Loader, Message } from "semantic-ui-react";
 
+const PNF = require('google-libphonenumber').PhoneNumberFormat;
+const phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
+
 import VideoChat from "../modules/VideoChat";
 import { post, error } from "../../utilities";
 import { socket } from "../../client-socket";
@@ -73,7 +76,9 @@ class UserRoom extends Component {
 
   handleJoinQueue = () => {
     let emailOkay = !this.state.userInfo.email || /\S+@\S+\.\S+/.test(this.state.userInfo.email);
-    let phoneOkay = !this.state.userInfo.phone || /^\d{10}$/.test(this.state.userInfo.phone);
+
+    const number = phoneUtil.parseAndKeepRawInput(this.state.userInfo.phone, /*default_region=*/'US');
+    let phoneOkay = !this.state.userInfo.phone || phoneUtil.isValidNumber(number);
 
     if (emailOkay && phoneOkay) {
       this.setState({
@@ -86,7 +91,7 @@ class UserRoom extends Component {
         socketID: socket.id,
         name: this.state.userInfo.name,
         email: this.state.userInfo.email, 
-        phone: this.state.userInfo.phone, 
+        phone: phoneUtil.format(number, PNF.NATIONAL),
         town: this.state.userInfo.town
       })
         .then(() => {
