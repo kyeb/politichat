@@ -212,11 +212,7 @@ class UserRoom extends Component {
         futureMessage = <Message color="orange">This room hasn't begun yet!</Message>;
       }
 
-      let rightColumn = (
-        <div>
-          <p>Enter your information to stay updated!</p>
-        </div>
-      );
+      let rightColumn = <div />;
 
       let websiteLink = <div />;
       if (this.props.room.link) {
